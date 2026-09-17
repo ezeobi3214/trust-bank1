@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+  body {
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    font-family: 'Courier Prime', monospace;
+  }
+  .receipt {
+    background: #fff;
+    padding: 2rem;
+    width: 380px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    color: #1f2937;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 2px dashed #9ca3af;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .header p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .divider {
+    border-top: 1px dashed #9ca3af;
+    margin: 1rem 0;
+  }
+  .total {
+    font-weight: bold;
+    font-size: 1.125rem;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  .print-btn {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    font-family: sans-serif;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+  @media print {
+    body { background: none; padding: 0; }
+    .receipt { box-shadow: none; border: none; }
+    .print-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="receipt">
+  <div class="header">
+    <h1>TRUST BANK</h1>
+    <p>Transaction Receipt</p>
+  </div>
+  
+  <div id="receipt-content">
+    Loading...
+  </div>
+
+  <button class="print-btn" onclick="window.print()">Print Receipt</button>
+  <a href="dashboard.html" class="print-btn" style="background: #374151; margin-top: 0.5rem;">Back to Dashboard</a>
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const tx = getTransaction(id);
+    
+    const content = document.getElementById('receipt-content');
+    
+    if (!tx) {
+      content.innerHTML = '<p>Transaction not found.</p>';
+      return;
+    }
+    
+    const absAmount = formatCurrency(Math.abs(tx.amount));
+    const ref = tx.id.toUpperCase();
+    
+    content.innerHTML = `
+      <div class="row">
+        <span>Date:</span>
+        <span>${tx.date}</span>
+      </div>
+      <div class="row">
+        <span>Ref No:</span>
+        <span>${ref}</span>
+      </div>
+      <div class="row">
+        <span>Type:</span>
+        <span>FASTER PAYMENTS OUT</span>
+      </div>
+      <div class="divider"></div>
+      
+      <div class="row">
+        <span>Payee:</span>
+        <span>${tx.payee}</span>
+      </div>
+      <div class="row">
+        <span>Account No:</span>
+        <span>${tx.account || '****' + Math.floor(1000 + Math.random()*9000)}</span>
+      </div>
+      <div class="row">
+        <span>Sort Code:</span>
+        <span>20-45-14</span>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <div class="row total">
+        <span>AMOUNT:</span>
+        <span>${absAmount}</span>
+      </div>
+      
+      <div class="row mt-2" style="margin-top: 1rem;">
+        <span>Status:</span>
+        <span>${tx.status.toUpperCase()}</span>
+      </div>
+      
+      <div class="footer">
+        <p>Thank you for banking with Trust Bank.</p>
+        <p>This is a computer generated receipt.</p>
+      </div>
+    `;
+  });
+</script>
+</body>
+</html>

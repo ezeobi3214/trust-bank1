@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col font-['Manrope']">
+<header class="bg-blue-700 text-white p-4 flex items-center justify-between shadow">
+  <div class="flex items-center gap-2">
+    <a href="dashboard.html" class="material-symbols-outlined text-white hover:text-gray-200">arrow_back</a>
+    <h1 class="text-xl font-bold">Customer Care</h1>
+  </div>
+</header>
+<main class="flex-1 overflow-y-auto p-4 flex flex-col gap-4" id="chat-box">
+  <!-- Messages will appear here -->
+</main>
+<footer class="bg-white p-4 border-t flex items-center gap-2">
+  <input type="text" id="chat-input" class="flex-1 bg-gray-100 border-none rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a message...">
+  <button id="send-btn" class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700">
+    <span class="material-symbols-outlined">send</span>
+  </button>
+</footer>
+
+<script src="app.js"></script>
+<script>
+  function renderMessages() {
+    const box = document.getElementById('chat-box');
+    const msgs = getMessages();
+    box.innerHTML = '';
+    
+    if (msgs.length === 0) {
+      box.innerHTML = '<div class="text-center text-gray-500 my-4 text-sm">Chat started. Support is here to help!</div>';
+    }
+
+    msgs.forEach(m => {
+      const isUser = m.sender === 'User';
+      const alignClass = isUser ? 'self-end bg-blue-600 text-white' : 'self-start bg-gray-200 text-gray-800';
+      const radiusClass = isUser ? 'rounded-tl-xl rounded-bl-xl rounded-tr-xl' : 'rounded-tr-xl rounded-br-xl rounded-tl-xl';
+      
+      const el = document.createElement('div');
+      el.className = `max-w-[75%] px-4 py-2 ${radiusClass} ${alignClass}`;
+      el.innerHTML = `
+        <div class="text-sm font-semibold mb-1 opacity-70">${m.sender}</div>
+        <p>${m.text}</p>
+        <div class="text-xs text-right mt-1 opacity-70">${m.time}</div>
+      `;
+      box.appendChild(el);
+    });
+    
+    box.scrollTop = box.scrollHeight;
+  }
+
+  document.getElementById('send-btn').addEventListener('click', () => {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if(text) {
+      addMessage('User', text);
+      input.value = '';
+      renderMessages();
+    }
+  });
+
+  document.getElementById('chat-input').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') document.getElementById('send-btn').click();
+  });
+
+  setInterval(renderMessages, 2000);
+  renderMessages();
+</script>
+</body>
+</html>

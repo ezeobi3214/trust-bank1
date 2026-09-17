@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#525557", "surface-container": "#e9edff", "secondary": "#006c49", "on-primary-fixed": "#00174b", "on-tertiary-container": "#eff0f2", "on-primary-fixed-variant": "#003ea8", "secondary-container": "#6cf8bb", "surface-container-high": "#e1e8fd", "on-secondary-fixed-variant": "#005236", "surface": "#f9f9ff", "on-surface-variant": "#434655", "on-secondary-container": "#00714d", "tertiary-fixed-dim": "#c5c6c8", "on-surface": "#141b2b", "on-tertiary": "#ffffff", "surface-bright": "#f9f9ff", "outline-variant": "#c3c6d7", "primary": "#004ac6", "background": "#f9f9ff", "on-background": "#141b2b", "surface-dim": "#d3daef", "on-primary": "#ffffff", "on-secondary-fixed": "#002113", "primary-fixed-dim": "#b4c5ff", "on-error": "#ffffff", "surface-container-low": "#f1f3ff", "primary-container": "#2563eb", "error-container": "#ffdad6", "tertiary-fixed": "#e1e2e4", "outline": "#737686", "surface-container-lowest": "#ffffff", "inverse-primary": "#b4c5ff", "secondary-fixed-dim": "#4edea3", "tertiary-container": "#6b6d6f", "inverse-on-surface": "#edf0ff", "surface-container-highest": "#dce2f7", "on-secondary": "#ffffff", "primary-fixed": "#dbe1ff", "secondary-fixed": "#6ffbbe", "surface-variant": "#dce2f7", "error": "#ba1a1a", "on-primary-container": "#eeefff", "on-tertiary-fixed": "#191c1e", "on-tertiary-fixed-variant": "#444749", "surface-tint": "#0053db", "on-error-container": "#93000a", "inverse-surface": "#293040" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin": "2rem", "margin-mobile": "1rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-md": "1rem" }, "fontFamily": { "label-sm": ["Manrope"], "headline-lg": ["Manrope"], "display-hero": ["Manrope"], "label-md": ["Manrope"], "body-md": ["Manrope"], "body-lg": ["Manrope"], "display-hero-mobile": ["Manrope"], "tabular-balance": ["Manrope"], "body-sm": ["Manrope"], "headline-lg-mobile": ["Manrope"], "headline-md": ["Manrope"], "headline-sm": ["Manrope"] }, "fontSize": { "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "600" }], "tabular-balance": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased">
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <div class="h-20 max-w-[1200px] mx-auto px-margin-mobile lg:px-margin flex items-center justify-between gap-space-lg">
+    <div class="flex items-center gap-space-xl">
+      <a class="flex items-center gap-space-sm group" href="dashboard.html">
+        <div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[22px]">account_balance</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">Trust Bank</span>
+      </a>
+      <nav class="hidden lg:flex items-center gap-space-xs">
+        <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="dashboard.html">Dashboard</a>
+        <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="transfer.html">Transfers</a>
+        <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="#">Accounts</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-space-md">
+      <div class="flex items-center gap-space-sm pl-space-xs">
+        <div class="hidden md:flex flex-col text-right">
+          <span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Alex Morgan</span>
+          <span class="font-label-sm text-label-sm text-outline leading-tight">Checking ••4820</span>
+        </div>
+        <a href="profile.html" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.06)] cursor-pointer">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </a>
+        <a href="index.html" class="ml-2 text-sm text-primary underline">Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="w-full pt-20 bg-surface min-h-screen">
+  <div class="flex flex-col w-full max-w-[1200px] mx-auto px-margin-mobile lg:px-margin py-space-xl">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
+      <div class="space-y-space-xs max-w-2xl">
+        <div class="flex items-center gap-space-xs">
+          <span class="w-2 h-2 rounded-full bg-primary"></span>
+          <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Account Management</span>
+        </div>
+        <h1 class="font-display-hero text-headline-lg lg:text-display-hero text-on-surface tracking-tight">Profile &amp; Settings</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Manage your personal credentials, linked routing parameters, security protocols, and operational preferences.</p>
+      </div>
+      <div class="flex items-center gap-space-sm self-start md:self-auto">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm font-semibold">
+          <span class="material-symbols-outlined text-[16px]">verified</span>Tier-1 Verified
+        </span>
+        <span class="text-outline font-label-sm text-label-sm">ID: TB-882109</span>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+      <aside class="lg:col-span-4 w-full">
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md space-y-space-xs sticky top-24">
+          <div class="px-space-md py-space-sm mb-space-xs">
+            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Navigation</span>
+          </div>
+          <button class="w-full flex items-center justify-between px-space-md py-space-sm rounded-lg bg-surface-container-low text-primary font-label-md text-label-md font-semibold transition-colors" type="button">
+            <div class="flex items-center gap-space-sm">
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">badge</span>
+              <span>Personal Info</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          </button>
+          <a class="w-full flex items-center justify-between px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" href="#security">
+            <div class="flex items-center gap-space-sm">
+              <span class="material-symbols-outlined text-[20px]">security</span>
+              <span>Security &amp; Biometrics</span>
+            </div>
+            <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+          </a>
+          <a class="w-full flex items-center justify-between px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" href="#accounts">
+            <div class="flex items-center gap-space-sm">
+              <span class="material-symbols-outlined text-[20px]">account_balance</span>
+              <span>Linked Accounts &amp; Routing</span>
+            </div>
+            <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+          </a>
+        </div>
+      </aside>
+
+      <main class="lg:col-span-8 space-y-space-xl w-full">
+        <section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-lg">
+            <div class="flex items-center gap-space-lg">
+              <div class="relative">
+                <div class="w-20 h-20 rounded-full overflow-hidden bg-primary flex items-center justify-center text-on-primary font-headline-lg text-headline-lg shadow-sm">
+                  <span class="material-symbols-outlined text-[40px]">person</span>
+                </div>
+                <span class="absolute bottom-0 right-0 w-5 h-5 bg-secondary rounded-full flex items-center justify-center text-on-secondary shadow-sm">
+                  <span class="material-symbols-outlined text-[13px]">check</span>
+                </span>
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">Alex Morgan</h2>
+                  <span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold">Primary</span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">Member since October 2021 • Verified Tier-1 Banking Customer</p>
+                <p class="font-label-sm text-label-sm text-outline">San Francisco Metropolitan Region, USA</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Personal Information</h3>
+              <p class="font-body-sm text-body-sm text-outline">Verify legal name, verified communication endpoints, and permanent address.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+            <div class="space-y-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Full Legal Name</label>
+              <div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-lg">
+                <span class="font-body-md text-body-md text-on-surface font-medium" id="display-name">...</span>
+                <span class="material-symbols-outlined text-outline text-[18px]">lock</span>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Date of Birth</label>
+              <div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-lg">
+                <span class="font-body-md text-body-md text-on-surface font-medium" id="display-dob">...</span>
+                <span class="material-symbols-outlined text-outline text-[18px]">lock</span>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Email Address</label>
+              <div class="flex items-center justify-between p-space-md bg-surface-container-lowest shadow-sm rounded-lg">
+                <input class="bg-transparent font-body-md text-body-md text-on-surface w-full focus:outline-none" readonly="" type="email" id="display-email" value=""/>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Primary Phone Number</label>
+              <div class="flex items-center justify-between p-space-md bg-surface-container-lowest shadow-sm rounded-lg">
+                <input class="bg-transparent font-body-md text-body-md text-on-surface w-full focus:outline-none" readonly="" type="tel" id="display-phone" value=""/>
+              </div>
+            </div>
+            <div class="space-y-1.5 md:col-span-2">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Primary Residential Address</label>
+              <div class="flex items-center justify-between p-space-md bg-surface-container-lowest shadow-sm rounded-lg">
+                <div class="flex items-center gap-space-sm">
+                  <span class="material-symbols-outlined text-outline text-[20px]">home_pin</span>
+                  <span class="font-body-md text-body-md text-on-surface" id="display-address">...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-lg" id="accounts">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Account Identifiers &amp; Routing</h3>
+            </div>
+          </div>
+          <div class="space-y-space-sm">
+            <div class="p-space-md rounded-lg bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                  <span class="font-label-md text-label-md text-on-surface font-semibold">Everyday Checking Account</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-headline-sm text-headline-sm tracking-widest text-on-surface font-mono" id="checking-acct">•••• •••• ••••</span>
+                  <button class="text-primary text-label-sm font-label-sm hover:underline ml-1" id="reveal-checking" type="button">Reveal</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+      </main>
+    </div>
+  </div>
+</main>
+<script src="app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const p = getProfile();
+    document.getElementById('display-name').textContent = p.name;
+    document.getElementById('display-dob').textContent = p.dob;
+    document.getElementById('display-email').value = p.email;
+    document.getElementById('display-phone').value = p.phone;
+    document.getElementById('display-address').textContent = p.address;
+    
+    // Header names
+    document.querySelectorAll('.font-label-md.leading-tight, h2.text-on-surface').forEach(el => {
+      if(el.textContent.includes('Alex Morgan')) el.textContent = p.name;
+    });
+
+    const checkingNum = p.checking;
+    const hiddenChecking = '•••• •••• ' + checkingNum.slice(-4);
+    
+    const revealBtn = document.getElementById('reveal-checking');
+    const checkingDisplay = document.getElementById('checking-acct');
+    let isRevealed = false;
+    
+    checkingDisplay.textContent = hiddenChecking;
+
+    if (revealBtn && checkingDisplay) {
+      revealBtn.addEventListener('click', () => {
+        isRevealed = !isRevealed;
+        if (isRevealed) {
+          checkingDisplay.textContent = checkingNum;
+          revealBtn.textContent = 'Hide';
+        } else {
+          checkingDisplay.textContent = hiddenChecking;
+          revealBtn.textContent = 'Reveal';
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

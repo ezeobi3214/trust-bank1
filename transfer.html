@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#525557", "surface-container": "#e9edff", "secondary": "#006c49", "on-primary-fixed": "#00174b", "on-tertiary-container": "#eff0f2", "on-primary-fixed-variant": "#003ea8", "secondary-container": "#6cf8bb", "surface-container-high": "#e1e8fd", "on-secondary-fixed-variant": "#005236", "surface": "#f9f9ff", "on-surface-variant": "#434655", "on-secondary-container": "#00714d", "tertiary-fixed-dim": "#c5c6c8", "on-surface": "#141b2b", "on-tertiary": "#ffffff", "surface-bright": "#f9f9ff", "outline-variant": "#c3c6d7", "primary": "#004ac6", "background": "#f9f9ff", "on-background": "#141b2b", "surface-dim": "#d3daef", "on-primary": "#ffffff", "on-secondary-fixed": "#002113", "primary-fixed-dim": "#b4c5ff", "on-error": "#ffffff", "surface-container-low": "#f1f3ff", "primary-container": "#2563eb", "error-container": "#ffdad6", "tertiary-fixed": "#e1e2e4", "outline": "#737686", "surface-container-lowest": "#ffffff", "inverse-primary": "#b4c5ff", "secondary-fixed-dim": "#4edea3", "tertiary-container": "#6b6d6f", "inverse-on-surface": "#edf0ff", "surface-container-highest": "#dce2f7", "on-secondary": "#ffffff", "primary-fixed": "#dbe1ff", "secondary-fixed": "#6ffbbe", "surface-variant": "#dce2f7", "error": "#ba1a1a", "on-primary-container": "#eeefff", "on-tertiary-fixed": "#191c1e", "on-tertiary-fixed-variant": "#444749", "surface-tint": "#0053db", "on-error-container": "#93000a", "inverse-surface": "#293040" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin": "2rem", "margin-mobile": "1rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-md": "1rem" }, "fontFamily": { "label-sm": ["Manrope"], "headline-lg": ["Manrope"], "display-hero": ["Manrope"], "label-md": ["Manrope"], "body-md": ["Manrope"], "body-lg": ["Manrope"], "display-hero-mobile": ["Manrope"], "tabular-balance": ["Manrope"], "body-sm": ["Manrope"], "headline-lg-mobile": ["Manrope"], "headline-md": ["Manrope"], "headline-sm": ["Manrope"] }, "fontSize": { "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "600" }], "tabular-balance": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased">
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <div class="h-20 max-w-[1200px] mx-auto px-margin-mobile lg:px-margin flex items-center justify-between gap-space-lg">
+    <div class="flex items-center gap-space-xl">
+      <a class="flex items-center gap-space-sm group" href="dashboard.html">
+        <div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[22px]">account_balance</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">Trust Bank</span>
+      </a>
+      <nav class="hidden lg:flex items-center gap-space-xs">
+        <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="dashboard.html">Dashboard</a>
+        <a aria-current="page" class="px-space-md py-space-sm rounded-lg transition-colors bg-surface-container-low text-on-surface font-semibold" href="transfer.html">Transfers</a>
+        <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="#">Accounts</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-space-md">
+      <div class="flex items-center gap-space-sm pl-space-xs">
+        <div class="hidden md:flex flex-col text-right">
+          <span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Alex Morgan</span>
+          <span class="font-label-sm text-label-sm text-outline leading-tight">Checking ••4820</span>
+        </div>
+        <a href="profile.html" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.06)] cursor-pointer">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </a>
+        <a href="index.html" class="ml-2 text-sm text-primary underline">Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="w-full pt-20 bg-surface min-h-screen">
+  <div class="flex flex-col w-full">
+    <div class="max-w-[1200px] w-full mx-auto px-margin-mobile lg:px-margin py-space-xl">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
+        <div>
+          <h1 class="font-display-hero text-display-hero text-on-surface tracking-tight">Move Money</h1>
+        </div>
+        <div class="bg-surface-container-low px-space-md py-space-sm rounded-xl flex items-center gap-space-md shadow-sm">
+          <div>
+            <span class="font-label-sm text-label-sm text-outline block leading-none">Primary Liquidity</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface font-semibold tabular-nums leading-tight" id="display-balance">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+        <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-space-lg lg:p-space-xl shadow-sm flex flex-col gap-space-lg">
+          
+          <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline" id="error-text"></span>
+          </div>
+          
+          <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Success:</strong>
+            <span class="block sm:inline">Transfer initiated and is pending admin approval.</span>
+          </div>
+
+          <div class="flex flex-col gap-space-xs mb-4">
+            <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Recipient Name</label>
+            <input type="text" id="transfer-payee" placeholder="Enter recipient name" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
+          </div>
+
+          <div class="flex flex-col gap-space-xs">
+            <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Account Number</label>
+            <input type="text" id="transfer-account" placeholder="Enter account number" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
+          </div>
+
+          <div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col items-center justify-center text-center mt-4">
+            <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider mb-space-xs">Transfer Amount</label>
+            <div class="flex items-center justify-center w-full my-space-xs">
+              <span class="font-display-hero text-display-hero text-outline font-semibold select-none mr-1">$</span>
+              <input class="font-display-hero text-display-hero text-on-surface bg-transparent text-center focus:outline-none max-w-[280px] font-semibold tabular-nums" id="transfer-amount" placeholder="0.00" type="number" step="0.01" value="">
+            </div>
+          </div>
+
+          <div>
+            <button class="w-full py-4 bg-primary-container hover:bg-primary text-on-primary rounded-xl font-headline-sm text-headline-sm font-semibold tracking-tight transition-all duration-200 active:scale-[0.99] shadow-sm flex items-center justify-center gap-space-sm" id="send-btn" type="button">
+              <span>Review & Send Transfer</span>
+              <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="lg:col-span-4 flex flex-col gap-space-lg">
+          <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Account Limits</h2>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex justify-between items-center">
+                <span class="font-label-md text-label-md text-on-surface font-medium">Max Transfer Limit</span>
+                <span class="font-label-sm text-label-sm text-on-surface font-semibold tabular-nums" id="display-limit"></span>
+              </div>
+              <span class="font-body-sm text-body-sm text-outline">Set by Administrator</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('display-balance').textContent = formatCurrency(getBalance());
+    document.getElementById('display-limit').textContent = formatCurrency(getTransferLimit());
+
+    const sendBtn = document.getElementById('send-btn');
+    const amountInput = document.getElementById('transfer-amount');
+    const payeeInput = document.getElementById('transfer-payee');
+    const accountInput = document.getElementById('transfer-account');
+    const errorMsg = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const successMsg = document.getElementById('success-message');
+
+    sendBtn.addEventListener('click', () => {
+      errorMsg.classList.add('hidden');
+      successMsg.classList.add('hidden');
+      
+      const amount = parseFloat(amountInput.value);
+      const payee = payeeInput.value.trim();
+      const account = accountInput.value.trim();
+      
+      if (isNaN(amount) || amount <= 0) {
+        errorText.textContent = "Please enter a valid amount greater than 0.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+      
+      if (payee === '') {
+        errorText.textContent = "Please enter a recipient name.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+      
+      if (account === '') {
+        errorText.textContent = "Please enter an account number.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      const balance = getBalance();
+      if (amount > balance) {
+        errorText.textContent = "Insufficient funds.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      const limit = getTransferLimit();
+      if (amount > limit) {
+        errorText.textContent = "Transfer exceeds the maximum limit set by the administrator (" + formatCurrency(limit) + ").";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      // If checks pass, add pending transaction
+      sendBtn.disabled = true;
+      const orig = sendBtn.innerHTML;
+      sendBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span><span>Initiating...</span>';
+      
+      setTimeout(() => {
+        addTransaction({
+          payee: payee,
+          account: account,
+          amount: -Math.abs(amount), // negative for outgoing
+          type: 'outgoing',
+          status: 'Pending',
+          category: 'Manual Transfer'
+        });
+        
+        successMsg.classList.remove('hidden');
+        sendBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span><span>Transfer Pending Approval</span>';
+        sendBtn.classList.remove('bg-primary-container');
+        sendBtn.classList.add('bg-secondary');
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 500);
+      }, 300);
+    });
+  });
+</script>
+</body>
+</html>
