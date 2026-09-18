@@ -22,9 +22,9 @@ function initState() {
     localStorage.setItem('tb_transactions', JSON.stringify(defaultTransactions));
     localStorage.setItem('tb_profile', JSON.stringify(defaultProfile));
     localStorage.setItem('tb_messages', JSON.stringify([]));
-    localStorage.setItem('tb_user_email', 'user@bank');
+    localStorage.setItem('tb_user_email', 'user@com');
     localStorage.setItem('tb_user_pass', '11111');
-    localStorage.setItem('tb_admin_email', 'admin@bank');
+    localStorage.setItem('tb_admin_email', 'admin@com');
     localStorage.setItem('tb_admin_pass', '00000');
     localStorage.setItem('tb_initialized', 'true');
   }
