@@ -320,10 +320,15 @@
 
       const nameEls = document.querySelectorAll('.font-label-md.text-label-md.text-on-surface.font-semibold.leading-tight, .font-label-sm.text-outline-variant.block.mt-0\\.5');
       nameEls.forEach(el => {
-          if (el.textContent.includes('Alex Morgan') || el.classList.contains('leading-tight')) {
+          if (el.textContent.includes('Alex Morgan') || el.classList.contains('leading-tight') || el.textContent === '---') {
               el.textContent = profile.name || 'User';
           }
       });
+      
+      const headerAvatar = document.querySelector('header a[href="profile.html"]');
+      if (headerAvatar && profile.avatar) {
+        headerAvatar.innerHTML = `<img src="${profile.avatar}" class="w-full h-full object-cover rounded-full">`;
+      }
       
       const acctEls = document.querySelectorAll('.font-label-sm.text-outline.leading-tight, .font-body-sm.text-outline');
       if (profile.checking) {

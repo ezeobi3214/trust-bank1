@@ -41,8 +41,8 @@ const defaultState = {
   tb_transactions: defaultTransactions,
   tb_profile: defaultProfile,
   tb_messages: [],
-  tb_user_email: 'user@com',
-  tb_user_pass: '11111',
+  tb_user_email: '@trustbank25',
+  tb_user_pass: '222653',
   tb_admin_email: 'admin@com',
   tb_admin_pass: '00000'
 };
@@ -63,9 +63,26 @@ export async function initializeState() {
     if (!docSnap.exists()) {
       await setDoc(dbRef, defaultState);
       console.log("Firebase Database successfully pre-populated with baseline datasets!");
+    } else {
+      const data = docSnap.data();
+      // Force update the old user credentials if they are still present
+      if (data.tb_user_email === 'user@com' || data.tb_user_pass === '11111') {
+        await setDoc(dbRef, { tb_user_email: '@trustbank25', tb_user_pass: '222653' }, { merge: true });
+        console.log("Force updated credentials.");
+      }
     }
   } catch (error) {
     console.error("Initialization failure:", error);
+  }
+}
+
+export async function clearMessages() {
+  try {
+    await initialization;
+    await setDoc(dbRef, { tb_messages: [] }, { merge: true });
+    console.log("Messages cleared.");
+  } catch (error) {
+    console.error("Failed to clear messages:", error);
   }
 }
 

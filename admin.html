@@ -78,9 +78,14 @@
           <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
             <span class="material-symbols-outlined">manage_accounts</span> User Profile Editor
           </h2>
-          <a href="admin_chat.html" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
-            <span class="material-symbols-outlined">support_agent</span> Customer Care Chat
-          </a>
+          <div class="flex items-center gap-2">
+            <a href="admin_chat.html" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
+              <span class="material-symbols-outlined">support_agent</span> Customer Care Chat
+            </a>
+            <button id="clear-chat-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition flex items-center gap-2">
+              <span class="material-symbols-outlined">delete_sweep</span> Clear Chat
+            </button>
+          </div>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,7 +141,19 @@
 </main>
 
 <script type="module">
-  import { formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus } from './app.js';
+  import { clearMessages, formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus } from './app.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+    if (clearChatBtn) {
+      clearChatBtn.addEventListener('click', async () => {
+        if(confirm('Are you sure you want to delete all messages? This action cannot be undone.')) {
+          await clearMessages();
+          alert('All chat messages have been permanently deleted.');
+        }
+      });
+    }
+  });
 
   async function renderPendingTransactions() {
     const pendingList = document.getElementById('pending-list');
