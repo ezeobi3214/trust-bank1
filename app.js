@@ -151,11 +151,30 @@ export async function addTransaction(newTx) {
 }
 
 export async function updateTransactionStatus(id, status, note = '') {
-  const transactions = await getTransactions();
-  const updatedTransactions = transactions.map(transaction =>
-    transaction.id === id ? { ...transaction, status, ...(note ? { note } : {}) } : transaction
-  );
-  await setDoc(dbRef, { tb_transactions: updatedTransactions }, { merge: true });
+  try {
+    const docSnap = await getDoc(dbRef);
+    if (!docSnap.exists()) return;
+    const data = docSnap.data();
+    const transactions = data.tb_transactions || [];
+    let currentBalance = Number(data.tb_balance || 0);
+
+    const updatedTransactions = transactions.map(transaction => {
+      if (transaction.id === id) {
+        if (status === 'Approved' && transaction.status !== 'Approved') {
+           currentBalance += Number(transaction.amount || 0);
+        }
+        return { ...transaction, status, ...(note ? { note } : {}) };
+      }
+      return transaction;
+    });
+
+    await setDoc(dbRef, { 
+       tb_transactions: updatedTransactions, 
+       tb_balance: currentBalance.toFixed(2) 
+    }, { merge: true });
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export async function getTransaction(id) {

@@ -38,8 +38,8 @@
 </button>
 <div class="flex items-center gap-space-sm pl-space-xs">
 <div class="hidden md:flex flex-col text-right">
-<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Alex Morgan</span>
-<span class="font-label-sm text-label-sm text-outline leading-tight">Checking ••4820</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">---</span>
+<span class="font-label-sm text-label-sm text-outline leading-tight">Checking ••----</span>
 </div>
 <a href="profile.html" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.06)] cursor-pointer">
 <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
@@ -57,7 +57,7 @@
 <div>
 <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Dashboard Overview</span>
 <h1 class="font-display-hero text-headline-lg lg:text-display-hero text-on-surface tracking-tight mt-space-xs">
-  Good morning, Alex
+  Good morning, ---
 </h1>
 </div>
 <div class="flex items-center gap-space-sm self-start sm:self-auto bg-surface-container-low px-space-md py-space-xs rounded-full">
@@ -79,8 +79,9 @@
 </div>
 <div class="flex items-baseline gap-space-xs mt-space-xs">
 <span class="font-headline-lg text-headline-lg text-outline font-light">$</span>
-<span class="font-display-hero text-display-hero-mobile lg:text-display-hero text-on-surface tracking-tight font-bold">24,850.40</span>
+<span class="font-display-hero text-display-hero-mobile lg:text-display-hero text-on-surface tracking-tight font-bold" id="main-balance-text">---</span>
 <span class="font-label-md text-label-md text-outline ml-space-xs">USD</span>
+<button id="toggle-balance-btn" class="ml-2 text-on-surface-variant hover:text-on-surface flex items-center"><span class="material-symbols-outlined text-[20px]" id="toggle-balance-icon">visibility</span></button>
 </div>
 <span class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs">Across Checking and High-Yield Savings accounts</span>
 </div>
@@ -89,14 +90,14 @@
 <span class="material-symbols-outlined text-[18px]">send</span>
 <span>Transfer</span>
 </a>
-<button class="px-space-md py-3 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-sm transition-all active:scale-[0.98]" type="button">
-<span class="material-symbols-outlined text-[18px] text-on-surface-variant">atm</span>
-<span>Withdraw</span>
-</button>
-<button class="px-space-md py-3 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-sm transition-all active:scale-[0.98]" type="button">
-<span class="material-symbols-outlined text-[18px] text-on-surface-variant">add</span>
-<span>Add Money</span>
-</button>
+<a href="history.html" class="px-space-md py-3 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-sm transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">history</span>
+<span>History</span>
+</a>
+<a href="chat.html" class="px-space-md py-3 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-sm transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">support_agent</span>
+<span>Customer Care</span>
+</a>
 </div>
 </div>
 <!-- Account Split Cards Inner Bento -->
@@ -112,7 +113,7 @@
 </div>
 </div>
 <div class="flex flex-col items-end">
-<span class="font-headline-sm text-headline-sm text-on-surface font-semibold tabular-nums">$18,420.15</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold tabular-nums">---</span>
 <span class="font-label-sm text-label-sm text-outline">Available</span>
 </div>
 </div>
@@ -130,7 +131,7 @@
 </div>
 </div>
 <div class="flex flex-col items-end">
-<span class="font-headline-sm text-headline-sm text-on-surface font-semibold tabular-nums">$6,430.25</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold tabular-nums">---</span>
 <span class="font-label-sm text-label-sm text-secondary font-medium">+$22.75 this month</span>
 </div>
 </div>
@@ -185,8 +186,8 @@
 </div>
 <div class="flex items-end justify-between z-10">
 <div>
-<span class="font-headline-sm text-headline-sm tracking-widest block font-medium">•••• 4820</span>
-<span class="font-label-sm text-label-sm text-outline-variant block mt-0.5">Alex Morgan</span>
+<span class="font-headline-sm text-headline-sm tracking-widest block font-medium">•••• ----</span>
+<span class="font-label-sm text-label-sm text-outline-variant block mt-0.5">---</span>
 </div>
 <div class="flex flex-col items-end">
 <span class="text-[10px] text-outline-variant uppercase tracking-wider">Expires</span>
@@ -271,15 +272,50 @@
       });
     }
 
+    const toggleBalanceBtn = document.getElementById('toggle-balance-btn');
+    if (toggleBalanceBtn) {
+      const toggleIcon = document.getElementById('toggle-balance-icon');
+      // Set initial icon state based on localStorage
+      if (localStorage.getItem('hideBalance') === 'true') {
+        toggleIcon.textContent = 'visibility_off';
+      }
+      
+      toggleBalanceBtn.addEventListener('click', () => {
+        const isHidden = localStorage.getItem('hideBalance') === 'true';
+        const newHiddenState = !isHidden;
+        localStorage.setItem('hideBalance', newHiddenState.toString());
+        
+        toggleIcon.textContent = newHiddenState ? 'visibility_off' : 'visibility';
+        
+        const balanceEls = document.querySelectorAll('.font-display-hero.text-display-hero-mobile, .font-headline-sm.text-on-surface.font-semibold.tabular-nums');
+        if (balanceEls.length > 0) {
+          balanceEls[0].textContent = newHiddenState ? '****' : window._currentBalance;
+          if (balanceEls.length > 1) balanceEls[1].textContent = newHiddenState ? '****' : window._currentBalanceFormatted;
+          if (balanceEls.length > 2) balanceEls[2].textContent = newHiddenState ? '****' : '$0.00';
+        }
+      });
+    }
+
     listenToDatabaseChanges((dbData) => {
       if (!dbData) return;
+
 
       const profile = dbData.tb_profile || {};
       
       const balanceEls = document.querySelectorAll('.font-display-hero.text-display-hero-mobile, .font-headline-sm.text-on-surface.font-semibold.tabular-nums');
       if (balanceEls.length > 0) {
-        // Main balance is [0], Checking is [1], Savings is [2] in this layout.
-        balanceEls[0].textContent = formatCurrency(dbData.tb_balance).replace('$', '');
+        const rawBalance = formatCurrency(dbData.tb_balance).replace('$', '');
+        const isHidden = localStorage.getItem('hideBalance') === 'true';
+        
+        balanceEls[0].textContent = isHidden ? '****' : rawBalance;
+        
+        // Ensure the other balance fields are also updated/hidden correctly if they existed
+        if (balanceEls.length > 1) balanceEls[1].textContent = isHidden ? '****' : formatCurrency(dbData.tb_balance);
+        if (balanceEls.length > 2) balanceEls[2].textContent = isHidden ? '****' : '$0.00';
+        
+        // Make rawBalance accessible outside for the toggle click listener
+        window._currentBalance = rawBalance;
+        window._currentBalanceFormatted = formatCurrency(dbData.tb_balance);
       }
 
       const nameEls = document.querySelectorAll('.font-label-md.text-label-md.text-on-surface.font-semibold.leading-tight, .font-label-sm.text-outline-variant.block.mt-0\\.5');
