@@ -73,9 +73,65 @@
             <input type="text" id="transfer-payee" placeholder="Enter recipient name" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
           </div>
 
-          <div class="flex flex-col gap-space-xs">
+          <div class="flex flex-col gap-space-xs mb-4">
             <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Account Number</label>
             <input type="text" id="transfer-account" placeholder="Enter account number" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
+          </div>
+
+          <div class="flex flex-col gap-space-xs mb-4">
+            <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Recipient Country</label>
+            <select id="transfer-country" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm">
+              <option value="">Select a country</option>
+              <option value="Afghanistan">Afghanistan</option>
+              <option value="Albania">Albania</option>
+              <option value="Algeria">Algeria</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Australia">Australia</option>
+              <option value="Austria">Austria</option>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="Belgium">Belgium</option>
+              <option value="Brazil">Brazil</option>
+              <option value="Canada">Canada</option>
+              <option value="China">China</option>
+              <option value="Colombia">Colombia</option>
+              <option value="Denmark">Denmark</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Finland">Finland</option>
+              <option value="France">France</option>
+              <option value="Germany">Germany</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Greece">Greece</option>
+              <option value="India">India</option>
+              <option value="Indonesia">Indonesia</option>
+              <option value="Ireland">Ireland</option>
+              <option value="Israel">Israel</option>
+              <option value="Italy">Italy</option>
+              <option value="Japan">Japan</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Malaysia">Malaysia</option>
+              <option value="Mexico">Mexico</option>
+              <option value="Netherlands">Netherlands</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Norway">Norway</option>
+              <option value="Pakistan">Pakistan</option>
+              <option value="Philippines">Philippines</option>
+              <option value="Poland">Poland</option>
+              <option value="Portugal">Portugal</option>
+              <option value="Russia">Russia</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Singapore">Singapore</option>
+              <option value="South Africa">South Africa</option>
+              <option value="South Korea">South Korea</option>
+              <option value="Spain">Spain</option>
+              <option value="Sweden">Sweden</option>
+              <option value="Switzerland">Switzerland</option>
+              <option value="Turkey">Turkey</option>
+              <option value="United Arab Emirates">United Arab Emirates</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="United States of America">United States of America</option>
+              <option value="Vietnam">Vietnam</option>
+            </select>
           </div>
 
           <div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col items-center justify-center text-center mt-4">
@@ -117,15 +173,21 @@
 </main>
 
 <script type="module">
-  import { addTransaction, formatCurrency, getFinancials } from './app.js';
+  import { addTransaction, formatCurrency, getFinancials, getProfile } from './app.js';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     let financials = { balance: 0, limit: 0 };
     getFinancials().then(data => {
       financials = { balance: Number(data.balance), limit: Number(data.limit) };
       document.getElementById('display-balance').textContent = formatCurrency(financials.balance);
       document.getElementById('display-limit').textContent = formatCurrency(financials.limit);
     });
+
+    const profile = await getProfile();
+    const headerAvatar = document.querySelector('header a[href="profile.html"]');
+    if (headerAvatar && profile.avatar) {
+      headerAvatar.innerHTML = `<img src="${profile.avatar}" class="w-full h-full object-cover rounded-full">`;
+    }
 
     const sendBtn = document.getElementById('send-btn');
     const amountInput = document.getElementById('transfer-amount');
