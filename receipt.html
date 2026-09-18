@@ -92,7 +92,7 @@
 
 <script src="app.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  function renderReceipt() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     const tx = getTransaction(id);
@@ -107,6 +107,20 @@
     const absAmount = formatCurrency(Math.abs(tx.amount));
     const ref = tx.id.toUpperCase();
     
+    let statusHtml = `<span>${tx.status.toUpperCase()}</span>`;
+    
+    if (tx.status === 'Pending') {
+      statusHtml = `<span style="color: #d97706; font-weight: bold;">AWAITING APPROVAL <span id="dots">...</span></span>`;
+    } else if (tx.status === 'Declined') {
+      statusHtml = `<span style="color: #dc2626; font-weight: bold;">DECLINED</span>
+        <div style="margin-top: 10px; padding: 10px; background: #fee2e2; color: #991b1b; border: 1px solid #f87171; border-radius: 4px; text-align: center;">
+          Transfer failed. Please go to Customer Care to resolve this issue. <br>
+          <a href="chat.html" style="color: #991b1b; text-decoration: underline; font-weight: bold;">Contact Customer Care</a>
+        </div>`;
+    } else if (tx.status === 'Approved') {
+      statusHtml = `<span style="color: #16a34a; font-weight: bold;">APPROVED</span>`;
+    }
+
     content.innerHTML = `
       <div class="row">
         <span>Date:</span>
@@ -142,9 +156,9 @@
         <span>${absAmount}</span>
       </div>
       
-      <div class="row mt-2" style="margin-top: 1rem;">
-        <span>Status:</span>
-        <span>${tx.status.toUpperCase()}</span>
+      <div class="row mt-2" style="margin-top: 1rem; flex-direction: column;">
+        <span style="margin-bottom: 5px;">Status:</span>
+        ${statusHtml}
       </div>
       
       <div class="footer">
@@ -152,7 +166,24 @@
         <p>This is a computer generated receipt.</p>
       </div>
     `;
+
+    // Only set up interval if it's pending
+    if (tx.status === 'Pending') {
+      setTimeout(renderReceipt, 2000); // Check every 2 seconds
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderReceipt();
+    
+    // Animate dots if waiting
+    setInterval(() => {
+      const dots = document.getElementById('dots');
+      if (dots) {
+        if (dots.innerText.length >= 3) dots.innerText = '';
+        else dots.innerText += '.';
+      }
+    }, 500);
   });
-</script>
 </body>
 </html>

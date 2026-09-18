@@ -22,6 +22,10 @@ function initState() {
     localStorage.setItem('tb_transactions', JSON.stringify(defaultTransactions));
     localStorage.setItem('tb_profile', JSON.stringify(defaultProfile));
     localStorage.setItem('tb_messages', JSON.stringify([]));
+    localStorage.setItem('tb_user_email', 'user@bank');
+    localStorage.setItem('tb_user_pass', '11111');
+    localStorage.setItem('tb_admin_email', 'admin@bank');
+    localStorage.setItem('tb_admin_pass', '00000');
     localStorage.setItem('tb_initialized', 'true');
   }
 }
@@ -65,11 +69,11 @@ function getTransactions() {
   let updated = false;
   const now = Date.now();
   
-  // Auto-decline pending transactions older than 3 minutes (180000 ms)
+  // Auto-decline pending transactions older than 1 minute (60000 ms)
   txs.forEach(tx => {
-    if (tx.status === 'Pending' && tx.createdAt && (now - tx.createdAt > 180000)) {
+    if (tx.status === 'Pending' && tx.createdAt && (now - tx.createdAt > 60000)) {
       tx.status = 'Declined';
-      tx.note = 'Declined: Go to Customer Care';
+      tx.note = 'Declined: Please go to Customer Care';
       updated = true;
     }
   });
@@ -115,3 +119,10 @@ function formatCurrency(amount) {
 
 // Initialize on script load
 initState();
+
+// Automatically reload the page if data changes in another tab
+window.addEventListener('storage', (e) => {
+  if (e.key && e.key.startsWith('tb_')) {
+    window.location.reload();
+  }
+});

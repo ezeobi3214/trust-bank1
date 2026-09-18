@@ -105,8 +105,18 @@
             <input type="text" id="prof-address" class="w-full bg-surface-container-low px-4 py-2 rounded-lg mt-1">
           </div>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t pt-4">
+          <div>
+            <label class="text-xs font-semibold text-outline uppercase">User Password</label>
+            <input type="text" id="prof-user-pass" class="w-full bg-surface-container-low px-4 py-2 rounded-lg mt-1">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-outline uppercase">Admin Password</label>
+            <input type="text" id="prof-admin-pass" class="w-full bg-surface-container-low px-4 py-2 rounded-lg mt-1">
+          </div>
+        </div>
         <div class="flex justify-end mt-2">
-          <button id="save-profile-btn" class="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition">Save Profile</button>
+          <button id="save-profile-btn" class="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition">Save Changes</button>
         </div>
       </div>
 
@@ -195,6 +205,8 @@
     document.getElementById('prof-email').value = p.email;
     document.getElementById('prof-phone').value = p.phone;
     document.getElementById('prof-address').value = p.address;
+    document.getElementById('prof-user-pass').value = localStorage.getItem('tb_user_pass') || '11111';
+    document.getElementById('prof-admin-pass').value = localStorage.getItem('tb_admin_pass') || '00000';
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -228,7 +240,13 @@
       p.phone = document.getElementById('prof-phone').value;
       p.address = document.getElementById('prof-address').value;
       setProfile(p);
-      alert('Profile updated successfully!');
+      
+      const uPass = document.getElementById('prof-user-pass').value;
+      const aPass = document.getElementById('prof-admin-pass').value;
+      if (uPass) localStorage.setItem('tb_user_pass', uPass);
+      if (aPass) localStorage.setItem('tb_admin_pass', aPass);
+      
+      alert('Profile and passwords updated successfully!');
     });
 
     // Initial render

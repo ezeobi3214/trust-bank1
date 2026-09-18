@@ -176,7 +176,7 @@
       sendBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span><span>Initiating...</span>';
       
       setTimeout(() => {
-        addTransaction({
+        const txId = addTransaction({
           payee: payee,
           account: account,
           amount: -Math.abs(amount), // negative for outgoing
@@ -191,7 +191,7 @@
         sendBtn.classList.add('bg-secondary');
         
         setTimeout(() => {
-          window.location.href = 'dashboard.html';
+          window.location.href = 'receipt.html?id=' + txId;
         }, 500);
       }, 300);
     });
