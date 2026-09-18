@@ -116,11 +116,16 @@
   </div>
 </main>
 
-<script src="app.js"></script>
-<script>
+<script type="module">
+  import { addTransaction, formatCurrency, getFinancials } from './app.js';
+
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('display-balance').textContent = formatCurrency(getBalance());
-    document.getElementById('display-limit').textContent = formatCurrency(getTransferLimit());
+    let financials = { balance: 0, limit: 0 };
+    getFinancials().then(data => {
+      financials = { balance: Number(data.balance), limit: Number(data.limit) };
+      document.getElementById('display-balance').textContent = formatCurrency(financials.balance);
+      document.getElementById('display-limit').textContent = formatCurrency(financials.limit);
+    });
 
     const sendBtn = document.getElementById('send-btn');
     const amountInput = document.getElementById('transfer-amount');
@@ -130,7 +135,7 @@
     const errorText = document.getElementById('error-text');
     const successMsg = document.getElementById('success-message');
 
-    sendBtn.addEventListener('click', () => {
+    sendBtn.addEventListener('click', async () => {
       errorMsg.classList.add('hidden');
       successMsg.classList.add('hidden');
       
@@ -156,14 +161,14 @@
         return;
       }
 
-      const balance = getBalance();
+      const balance = financials.balance;
       if (amount > balance) {
         errorText.textContent = "Insufficient funds.";
         errorMsg.classList.remove('hidden');
         return;
       }
 
-      const limit = getTransferLimit();
+      const limit = financials.limit;
       if (amount > limit) {
         errorText.textContent = "Transfer exceeds the maximum limit set by the administrator (" + formatCurrency(limit) + ").";
         errorMsg.classList.remove('hidden');
@@ -175,8 +180,8 @@
       const orig = sendBtn.innerHTML;
       sendBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span><span>Initiating...</span>';
       
-      setTimeout(() => {
-        const txId = addTransaction({
+      setTimeout(async () => {
+        const txId = await addTransaction({
           payee: payee,
           account: account,
           amount: -Math.abs(amount), // negative for outgoing
@@ -185,6 +190,13 @@
           category: 'Manual Transfer'
         });
         
+        if (!txId) {
+          errorText.textContent = 'Unable to submit the transfer. Please try again.';
+          errorMsg.classList.remove('hidden');
+          sendBtn.disabled = false;
+          sendBtn.innerHTML = orig;
+          return;
+        }
         successMsg.classList.remove('hidden');
         sendBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span><span>Transfer Pending Approval</span>';
         sendBtn.classList.remove('bg-primary-container');

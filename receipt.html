@@ -90,12 +90,13 @@
   <a href="dashboard.html" class="print-btn" style="background: #374151; margin-top: 0.5rem;">Back to Dashboard</a>
 </div>
 
-<script src="app.js"></script>
-<script>
-  function renderReceipt() {
+<script type="module">
+  import { formatCurrency, getTransaction } from './app.js';
+
+  async function renderReceipt() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    const tx = getTransaction(id);
+    const tx = await getTransaction(id);
     
     const content = document.getElementById('receipt-content');
     

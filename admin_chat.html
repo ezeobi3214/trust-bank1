@@ -24,11 +24,12 @@
   </button>
 </footer>
 
-<script src="app.js"></script>
-<script>
-  function renderMessages() {
+<script type="module">
+  import { addMessage, getMessages, listenToDatabaseChanges } from './app.js';
+
+  async function renderMessages(messages) {
     const box = document.getElementById('chat-box');
-    const msgs = getMessages();
+    const msgs = messages || await getMessages();
     box.innerHTML = '';
     
     if (msgs.length === 0) {
@@ -53,13 +54,13 @@
     box.scrollTop = box.scrollHeight;
   }
 
-  document.getElementById('send-btn').addEventListener('click', () => {
+  document.getElementById('send-btn').addEventListener('click', async () => {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if(text) {
-      addMessage('Admin', text);
+      await addMessage({ sender: 'Admin', text, time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) });
       input.value = '';
-      renderMessages();
+      await renderMessages();
     }
   });
 
@@ -67,7 +68,7 @@
     if(e.key === 'Enter') document.getElementById('send-btn').click();
   });
 
-  setInterval(renderMessages, 2000);
+  listenToDatabaseChanges(data => renderMessages(data?.tb_messages || []));
   renderMessages();
 </script>
 </body>

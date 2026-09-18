@@ -183,10 +183,11 @@
     </div>
   </div>
 </main>
-<script src="app.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const p = getProfile();
+<script type="module">
+  import { getProfile } from './app.js';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const p = await getProfile();
     document.getElementById('display-name').textContent = p.name;
     document.getElementById('display-dob').textContent = p.dob;
     document.getElementById('display-email').value = p.email;
@@ -194,9 +195,13 @@
     document.getElementById('display-address').textContent = p.address;
     
     // Header names
-    document.querySelectorAll('.font-label-md.leading-tight, h2.text-on-surface').forEach(el => {
-      if(el.textContent.includes('Alex Morgan')) el.textContent = p.name;
-    });
+    const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue.includes('Alex Morgan')) {
+        node.nodeValue = node.nodeValue.replace('Alex Morgan', p.name);
+      }
+    }
 
     const checkingNum = p.checking;
     const hiddenChecking = '•••• •••• ' + checkingNum.slice(-4);

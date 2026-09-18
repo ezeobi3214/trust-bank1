@@ -67,75 +67,84 @@
   </div>
 </main>
 
-<script src="app.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
+<script type="module">
+  import { formatCurrency, getTransactions } from './app.js';
+
+  document.addEventListener('DOMContentLoaded', async () => {
     const txList = document.getElementById('transaction-list');
-    const txs = getTransactions();
+    
+    async function loadTransactions() {
+      const txs = await getTransactions();
 
-    if (txs.length === 0) {
-      txList.innerHTML = '<p class="text-outline py-4">No transactions found.</p>';
-      return;
-    }
-
-    txs.forEach(tx => {
-      const isNegative = tx.amount < 0;
-      const amountClass = isNegative ? 'text-on-surface' : 'text-secondary';
-      const amountSign = isNegative ? '-' : '+';
-      const absAmount = formatCurrency(Math.abs(tx.amount));
-      
-      let icon = 'swap_horiz';
-      let iconBg = 'bg-surface-container-high';
-      let iconColor = 'text-on-surface';
-      if (tx.status === 'Pending') {
-        icon = 'pending';
-        iconColor = 'text-amber-600';
-      } else if (tx.status === 'Blocked') {
-        icon = 'block';
-        iconColor = 'text-red-600';
-      } else if (tx.type === 'incoming') {
-        icon = 'payments';
-        iconBg = 'bg-secondary-container/40';
-        iconColor = 'text-secondary';
-      } else if (tx.type === 'card outgoing') {
-        icon = 'shopping_cart';
+      if (txs.length === 0) {
+        txList.innerHTML = '<p class="text-outline py-4">No transactions found.</p>';
+        return;
       }
 
-      let statusPill = '';
-      if (tx.status === 'Pending') {
-        statusPill = `<span class="text-xs px-2 py-1 bg-amber-100 text-amber-800 rounded-full ml-2">Pending</span>`;
-      } else if (tx.status === 'Blocked') {
-        statusPill = `<span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full ml-2">Blocked</span>`;
-      }
+      let newHtml = '';
+      txs.forEach(tx => {
+        const isNegative = tx.amount < 0;
+        const amountClass = isNegative ? 'text-on-surface' : 'text-secondary';
+        const amountSign = isNegative ? '-' : '+';
+        const absAmount = formatCurrency(Math.abs(tx.amount));
+        
+        let icon = 'swap_horiz';
+        let iconBg = 'bg-surface-container-high';
+        let iconColor = 'text-on-surface';
+        if (tx.status === 'Pending') {
+          icon = 'pending';
+          iconColor = 'text-amber-600';
+        } else if (tx.status === 'Blocked') {
+          icon = 'block';
+          iconColor = 'text-red-600';
+        } else if (tx.type === 'incoming') {
+          icon = 'payments';
+          iconBg = 'bg-secondary-container/40';
+          iconColor = 'text-secondary';
+        } else if (tx.type === 'card outgoing') {
+          icon = 'shopping_cart';
+        }
 
-      let actionsHtml = '';
-      if (tx.status === 'Approved' && tx.amount < 0) {
-        actionsHtml = `<a href="receipt.html?id=${tx.id}" class="text-xs text-primary hover:underline mt-1 inline-block">View Receipt</a>`;
-      }
+        let statusPill = '';
+        if (tx.status === 'Pending') {
+          statusPill = `<span class="text-xs px-2 py-1 bg-amber-100 text-amber-800 rounded-full ml-2">Pending</span>`;
+        } else if (tx.status === 'Blocked') {
+          statusPill = `<span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full ml-2">Blocked</span>`;
+        }
 
-      txList.innerHTML += `
-        <div class="transaction-row py-4 flex items-center justify-between hover:bg-surface-container-low/50 px-space-xs rounded-lg transition-colors border-b border-surface-container-lowest last:border-0">
-          <div class="flex items-center gap-space-md min-w-0">
-            <div class="w-10 h-10 rounded-full ${iconBg} flex items-center justify-center flex-shrink-0 ${iconColor}">
-              <span class="material-symbols-outlined text-[20px]">${icon}</span>
-            </div>
-            <div class="flex flex-col min-w-0">
-              <span class="font-label-md text-label-md text-on-surface font-semibold truncate">${tx.payee} ${statusPill}</span>
-              <div class="flex items-center gap-space-xs">
-                <span class="font-body-sm text-body-sm text-outline">${tx.date}</span>
-                ${tx.category ? `<span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-body-sm text-body-sm text-on-surface-variant">${tx.category}</span>` : ''}
+        let actionsHtml = '';
+        if (tx.status === 'Approved' && tx.amount < 0) {
+          actionsHtml = `<a href="receipt.html?id=${tx.id}" class="text-xs text-primary hover:underline mt-1 inline-block">View Receipt</a>`;
+        }
+
+        newHtml += `
+          <div class="transaction-row py-4 flex items-center justify-between hover:bg-surface-container-low/50 px-space-xs rounded-lg transition-colors border-b border-surface-container-lowest last:border-0">
+            <div class="flex items-center gap-space-md min-w-0">
+              <div class="w-10 h-10 rounded-full ${iconBg} flex items-center justify-center flex-shrink-0 ${iconColor}">
+                <span class="material-symbols-outlined text-[20px]">${icon}</span>
               </div>
-              ${actionsHtml}
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-md text-label-md text-on-surface font-semibold truncate">${tx.payee} ${statusPill}</span>
+                <div class="flex items-center gap-space-xs">
+                  <span class="font-body-sm text-body-sm text-outline">${tx.date}</span>
+                  ${tx.category ? `<span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-body-sm text-body-sm text-on-surface-variant">${tx.category}</span>` : ''}
+                </div>
+                ${actionsHtml}
+              </div>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 pl-space-sm">
+              <span class="font-headline-sm text-headline-sm ${amountClass} font-semibold tabular-nums">${amountSign}${absAmount}</span>
+              <span class="font-label-sm text-label-sm text-outline">${tx.status === 'Approved' ? 'Completed' : (tx.status === 'Declined' ? 'Declined' : tx.status)}</span>
+              ${tx.note ? `<span class="text-xs text-red-500">${tx.note}</span>` : ''}
             </div>
           </div>
-          <div class="flex flex-col items-end flex-shrink-0 pl-space-sm">
-            <span class="font-headline-sm text-headline-sm ${amountClass} font-semibold tabular-nums">${amountSign}${absAmount}</span>
-            <span class="font-label-sm text-label-sm text-outline">${tx.status === 'Approved' ? 'Completed' : (tx.status === 'Declined' ? 'Declined' : tx.status)}</span>
-            ${tx.note ? `<span class="text-xs text-red-500">${tx.note}</span>` : ''}
-          </div>
-        </div>
-      `;
-    });
+        `;
+      });
+      txList.innerHTML = newHtml;
+    }
+    
+    await loadTransactions();
+    setInterval(loadTransactions, 5000);
   });
 </script>
 </body>

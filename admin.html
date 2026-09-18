@@ -135,11 +135,12 @@
   </div>
 </main>
 
-<script src="app.js"></script>
-<script>
-  function renderPendingTransactions() {
+<script type="module">
+  import { formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus } from './app.js';
+
+  async function renderPendingTransactions() {
     const pendingList = document.getElementById('pending-list');
-    const txs = getTransactions().filter(t => t.status === 'Pending');
+    const txs = (await getTransactions()).filter(t => t.status === 'Pending');
     
     pendingList.innerHTML = '';
     
@@ -184,22 +185,25 @@
     });
   }
 
-  function handleApprove(id) {
+  async function handleApprove(id) {
     if(confirm('Are you sure you want to approve this transfer?')) {
-      updateTransactionStatus(id, 'Approved');
-      renderPendingTransactions();
+      await updateTransactionStatus(id, 'Approved');
+      await renderPendingTransactions();
     }
   }
 
-  function handleBlock(id) {
+  async function handleBlock(id) {
     if(confirm('Are you sure you want to block this transfer?')) {
-      updateTransactionStatus(id, 'Blocked');
-      renderPendingTransactions();
+      await updateTransactionStatus(id, 'Blocked');
+      await renderPendingTransactions();
     }
   }
 
-  function loadProfileData() {
-    const p = getProfile();
+  window.handleApprove = handleApprove;
+  window.handleBlock = handleBlock;
+
+  async function loadProfileData() {
+    const p = await getProfile();
     document.getElementById('prof-name').value = p.name;
     document.getElementById('prof-dob').value = p.dob;
     document.getElementById('prof-email').value = p.email;
@@ -209,37 +213,40 @@
     document.getElementById('prof-admin-pass').value = localStorage.getItem('tb_admin_pass') || '00000';
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     // Init values
-    document.getElementById('admin-balance').value = getBalance().toFixed(2);
-    document.getElementById('admin-limit').value = getTransferLimit().toFixed(2);
-    loadProfileData();
+    const financials = await getFinancials();
+    document.getElementById('admin-balance').value = Number(financials.balance).toFixed(2);
+    document.getElementById('admin-limit').value = Number(financials.limit).toFixed(2);
+    await loadProfileData();
 
     // Bind listeners
-    document.getElementById('save-balance-btn').addEventListener('click', () => {
+    document.getElementById('save-balance-btn').addEventListener('click', async () => {
       const val = parseFloat(document.getElementById('admin-balance').value);
       if(!isNaN(val)) {
-        setBalance(val);
+        const financials = await getFinancials();
+        await updateFinancials(val, Number(financials.limit));
         alert('User balance updated to ' + formatCurrency(val));
       }
     });
 
-    document.getElementById('save-limit-btn').addEventListener('click', () => {
+    document.getElementById('save-limit-btn').addEventListener('click', async () => {
       const val = parseFloat(document.getElementById('admin-limit').value);
       if(!isNaN(val)) {
-        setTransferLimit(val);
+        const financials = await getFinancials();
+        await updateFinancials(Number(financials.balance), val);
         alert('Max transfer limit updated to ' + formatCurrency(val));
       }
     });
 
-    document.getElementById('save-profile-btn').addEventListener('click', () => {
-      const p = getProfile();
+    document.getElementById('save-profile-btn').addEventListener('click', async () => {
+      const p = await getProfile();
       p.name = document.getElementById('prof-name').value;
       p.dob = document.getElementById('prof-dob').value;
       p.email = document.getElementById('prof-email').value;
       p.phone = document.getElementById('prof-phone').value;
       p.address = document.getElementById('prof-address').value;
-      setProfile(p);
+      await setProfile(p);
       
       const uPass = document.getElementById('prof-user-pass').value;
       const aPass = document.getElementById('prof-admin-pass').value;
@@ -250,7 +257,7 @@
     });
 
     // Initial render
-    renderPendingTransactions();
+    await renderPendingTransactions();
     
     // Auto-refresh pending list every 5 seconds to catch auto-declines or new transfers
     setInterval(() => {
