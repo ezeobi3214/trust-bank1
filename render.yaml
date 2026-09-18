@@ -1,7 +1,6 @@
 services:
   - type: web
     name: trust-bank
-    plan: free
     env: static
     staticPublishPath: .
     buildCommand: ""
