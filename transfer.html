@@ -28,7 +28,7 @@
     <div class="flex items-center gap-space-md">
       <div class="flex items-center gap-space-sm pl-space-xs">
         <div class="hidden md:flex flex-col text-right">
-          <span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Alex Morgan</span>
+          <span class="font-label-md text-label-md text-on-surface font-semibold leading-tight" id="header-user-name">---</span>
           <span class="font-label-sm text-label-sm text-outline leading-tight">Checking ••4820</span>
         </div>
         <a href="profile.html" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.06)] cursor-pointer">
@@ -188,6 +188,8 @@
     if (headerAvatar && profile.avatar) {
       headerAvatar.innerHTML = `<img src="${profile.avatar}" class="w-full h-full object-cover rounded-full">`;
     }
+    const headerUserName = document.getElementById('header-user-name');
+    if (headerUserName) headerUserName.textContent = profile.name;
 
     const sendBtn = document.getElementById('send-btn');
     const amountInput = document.getElementById('transfer-amount');
