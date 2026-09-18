@@ -36,8 +36,8 @@ const defaultProfile = {
 };
 
 const defaultState = {
-  tb_balance: '24850.40',
-  tb_transferLimit: '5000.00',
+  tb_balance: 24850.40,
+  tb_transferLimit: 5000.00,
   tb_transactions: defaultTransactions,
   tb_profile: defaultProfile,
   tb_messages: [],
@@ -65,10 +65,27 @@ export async function initializeState() {
       console.log("Firebase Database successfully pre-populated with baseline datasets!");
     } else {
       const data = docSnap.data();
+      const patches = {};
+
       // Force update the old user credentials if they are still present
       if (data.tb_user_email === 'user@com' || data.tb_user_pass === '11111') {
-        await setDoc(dbRef, { tb_user_email: '@trustbank25', tb_user_pass: '222653' }, { merge: true });
+        patches.tb_user_email = '@trustbank25';
+        patches.tb_user_pass = '222653';
         console.log("Force updated credentials.");
+      }
+
+      // Normalize balance from string to number if needed
+      if (typeof data.tb_balance === 'string') {
+        patches.tb_balance = parseFloat(data.tb_balance) || 0;
+        console.log("Normalized tb_balance from string to number:", patches.tb_balance);
+      }
+      if (typeof data.tb_transferLimit === 'string') {
+        patches.tb_transferLimit = parseFloat(data.tb_transferLimit) || 0;
+        console.log("Normalized tb_transferLimit from string to number:", patches.tb_transferLimit);
+      }
+
+      if (Object.keys(patches).length > 0) {
+        await setDoc(dbRef, patches, { merge: true });
       }
     }
   } catch (error) {
@@ -117,19 +134,25 @@ export async function getFinancials() {
     const docSnap = await getDoc(dbRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
-      return { balance: data.tb_balance, limit: data.tb_transferLimit };
+      return { 
+        balance: parseFloat(data.tb_balance) || 0, 
+        limit: parseFloat(data.tb_transferLimit) || 0 
+      };
     }
-    return { balance: '24850.40', limit: '5000.00' };
+    return { balance: 24850.40, limit: 5000.00 };
   } catch (error) {
     console.error("Read failure (financials):", error);
-    return { balance: '24850.40', limit: '5000.00' };
+    return { balance: 24850.40, limit: 5000.00 };
   }
 }
 
 export async function updateFinancials(balance, limit) {
   try {
     await initialization;
-    await setDoc(dbRef, { tb_balance: balance, tb_transferLimit: limit }, { merge: true });
+    await setDoc(dbRef, { 
+      tb_balance: parseFloat(parseFloat(balance).toFixed(2)), 
+      tb_transferLimit: parseFloat(parseFloat(limit).toFixed(2)) 
+    }, { merge: true });
     console.log("Financial modifications successfully synced.");
   } catch (error) {
     console.error("Write failure (financials):", error);
@@ -173,24 +196,33 @@ export async function updateTransactionStatus(id, status, note = '') {
     if (!docSnap.exists()) return;
     const data = docSnap.data();
     const transactions = data.tb_transactions || [];
-    let currentBalance = Number(data.tb_balance || 0);
+    let currentBalance = parseFloat(data.tb_balance) || 0;
 
+    let deductedAmount = 0;
     const updatedTransactions = transactions.map(transaction => {
       if (transaction.id === id) {
+        // Only deduct balance when first approving an outgoing transaction
         if (status === 'Approved' && transaction.status !== 'Approved') {
-           currentBalance += Number(transaction.amount || 0);
+          const amt = parseFloat(transaction.amount) || 0;
+          if (amt < 0) {
+            deductedAmount = amt; // negative number
+            currentBalance += amt; // subtract from balance
+          }
         }
         return { ...transaction, status, ...(note ? { note } : {}) };
       }
       return transaction;
     });
 
+    const newBalance = parseFloat(currentBalance.toFixed(2));
+    console.log(`[updateTransactionStatus] id=${id} status=${status} deducted=${deductedAmount} newBalance=${newBalance}`);
+
     await setDoc(dbRef, { 
        tb_transactions: updatedTransactions, 
-       tb_balance: currentBalance.toFixed(2) 
+       tb_balance: newBalance
     }, { merge: true });
   } catch (err) {
-    console.error(err);
+    console.error('updateTransactionStatus error:', err);
   }
 }
 
