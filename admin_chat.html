@@ -6,6 +6,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="manifest" href="manifest.json">
 </head>
 <body class="bg-gray-50 h-screen flex flex-col font-['Manrope']">
 <header class="bg-blue-900 text-white p-4 flex items-center justify-between shadow">
@@ -71,5 +73,33 @@
   listenToDatabaseChanges(data => renderMessages(data?.tb_messages || []));
   renderMessages();
 </script>
+
+<div id="google_translate_element" style="position:fixed; bottom:20px; right:20px; z-index:9999;"></div>
+
+
+<!-- Google Translate Logic and Initialize Function -->
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en', 
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+    }
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(registration => {
+        console.log('ServiceWorker registration successful');
+      }).catch(err => {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+</script>
+
 </body>
 </html>
