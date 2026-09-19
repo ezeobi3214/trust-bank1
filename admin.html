@@ -143,7 +143,7 @@
 </main>
 
 <script type="module">
-  import { clearMessages, formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus } from './app.js';
+  import { clearMessages, formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus, getPasswords, updatePasswords } from './app.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     const clearChatBtn = document.getElementById('clear-chat-btn');
@@ -228,8 +228,9 @@
     document.getElementById('prof-email').value = p.email;
     document.getElementById('prof-phone').value = p.phone;
     document.getElementById('prof-address').value = p.address;
-    document.getElementById('prof-user-pass').value = localStorage.getItem('tb_user_pass') || '11111';
-    document.getElementById('prof-admin-pass').value = localStorage.getItem('tb_admin_pass') || '00000';
+    const passes = await getPasswords();
+    document.getElementById('prof-user-pass').value = passes.userPass;
+    document.getElementById('prof-admin-pass').value = passes.adminPass;
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
@@ -269,8 +270,7 @@
       
       const uPass = document.getElementById('prof-user-pass').value;
       const aPass = document.getElementById('prof-admin-pass').value;
-      if (uPass) localStorage.setItem('tb_user_pass', uPass);
-      if (aPass) localStorage.setItem('tb_admin_pass', aPass);
+      await updatePasswords(uPass, aPass);
       
       alert('Profile and passwords updated successfully!');
     });

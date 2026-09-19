@@ -67,12 +67,7 @@ export async function initializeState() {
       const data = docSnap.data();
       const patches = {};
 
-      // Force update the old user credentials if they are still present
-      if (data.tb_user_email === 'user@com' || data.tb_user_pass === '11111') {
-        patches.tb_user_email = '@trustbank25';
-        patches.tb_user_pass = '222653';
-        console.log("Force updated credentials.");
-      }
+
 
       // Normalize balance from string to number if needed
       if (typeof data.tb_balance === 'string') {
@@ -263,4 +258,62 @@ export function listenToDatabaseChanges(callback) {
     unsubscribe = onSnapshot(dbRef, snapshot => callback(snapshot.exists() ? snapshot.data() : null));
   });
   return () => unsubscribe?.();
+}
+// ==========================================
+// 5. PASSWORD LOGIC
+// ==========================================
+export async function getPasswords() {
+  try {
+    await initialization;
+    const docSnap = await getDoc(dbRef);
+    if (docSnap.exists()) {
+      return {
+        userPass: docSnap.data().tb_user_pass || '',
+        adminPass: docSnap.data().tb_admin_pass || ''
+      };
+    }
+  } catch (err) {
+    console.error("Read failure (passwords):", err);
+  }
+  return { userPass: '', adminPass: '' };
+}
+
+export async function updatePasswords(userPass, adminPass) {
+  try {
+    await initialization;
+    const patches = {};
+    if (userPass) patches.tb_user_pass = userPass;
+    if (adminPass) patches.tb_admin_pass = adminPass;
+    if (Object.keys(patches).length > 0) {
+      await setDoc(dbRef, patches, { merge: true });
+      console.log("Passwords updated in Firebase.");
+    }
+  } catch (err) {
+    console.error("Write failure (passwords):", err);
+  }
+}
+
+// ==========================================
+// 6. AUTO LOGOUT LOGIC (2 HOURS)
+// ==========================================
+let inactivityTimer;
+const INACTIVITY_LIMIT = 2 * 60 * 60 * 1000; // 2 hours
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    if (!window.location.pathname.endsWith('index.html') && window.location.pathname !== '/') {
+      window.location.href = 'index.html';
+    }
+  }, INACTIVITY_LIMIT);
+}
+
+// Ensure it only runs in browser environment
+if (typeof window !== 'undefined') {
+  window.addEventListener('mousemove', resetInactivityTimer);
+  window.addEventListener('keydown', resetInactivityTimer);
+  window.addEventListener('click', resetInactivityTimer);
+  window.addEventListener('scroll', resetInactivityTimer);
+  window.addEventListener('touchstart', resetInactivityTimer);
+  resetInactivityTimer();
 }
