@@ -129,9 +129,14 @@
 
       <!-- Pending Transfers List -->
       <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg lg:p-space-xl flex flex-col mt-4">
-        <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2 mb-6">
-          <span class="material-symbols-outlined text-red-500 notranslate" translate="no">pending_actions</span> Pending Transfers
-        </h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-red-500 notranslate" translate="no">pending_actions</span> Pending Transfers
+          </h2>
+          <button id="clear-tx-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition flex items-center gap-2">
+            <span class="material-symbols-outlined notranslate" translate="no">delete_sweep</span> Clear All Transactions
+          </button>
+        </div>
         
         <div class="flex flex-col gap-4" id="pending-list">
           <!-- JS Rendered -->
@@ -143,7 +148,7 @@
 </main>
 
 <script type="module">
-  import { clearMessages, formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus, getPasswords, updatePasswords } from './app.js';
+  import { clearMessages, clearTransactions, formatCurrency, getFinancials, getProfile, getTransactions, setProfile, updateFinancials, updateTransactionStatus, getPasswords, updatePasswords } from './app.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     const clearChatBtn = document.getElementById('clear-chat-btn');
@@ -152,6 +157,17 @@
         if(confirm('Are you sure you want to delete all messages? This action cannot be undone.')) {
           await clearMessages();
           alert('All chat messages have been permanently deleted.');
+        }
+      });
+    }
+
+    const clearTxBtn = document.getElementById('clear-tx-btn');
+    if (clearTxBtn) {
+      clearTxBtn.addEventListener('click', async () => {
+        if(confirm('Are you sure you want to delete all transactions? This action cannot be undone.')) {
+          await clearTransactions();
+          alert('All transactions have been permanently deleted.');
+          await renderPendingTransactions();
         }
       });
     }

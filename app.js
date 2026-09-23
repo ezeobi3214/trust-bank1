@@ -98,6 +98,17 @@ export async function clearMessages() {
   }
 }
 
+export async function clearTransactions() {
+  try {
+    await initialization;
+    await setDoc(dbRef, { tb_transactions: [] }, { merge: true });
+    console.log("Transactions cleared.");
+  } catch (error) {
+    console.error("Failed to clear transactions:", error);
+  }
+}
+
+
 export const initState = initializeState;
 
 // PROFILE LOGIC
