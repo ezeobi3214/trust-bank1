@@ -33,6 +33,9 @@
           <span class="font-label-md text-label-md text-on-surface font-semibold leading-tight" id="header-user-name">---</span>
           <span class="font-label-sm text-label-sm text-outline leading-tight">Checking ••4820</span>
         </div>
+        <button id="dark-mode-toggle" class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center hover:bg-surface-container-high transition-colors cursor-pointer text-on-surface-variant mr-1">
+          <span class="material-symbols-outlined text-[18px]" id="dark-mode-icon">dark_mode</span>
+        </button>
         <a href="profile.html" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.06)] cursor-pointer">
           <span class="material-symbols-outlined text-on-primary text-[18px] notranslate" translate="no">person</span>
         </a>
@@ -73,6 +76,11 @@
           <div class="flex flex-col gap-space-xs mb-4">
             <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Recipient Name</label>
             <input type="text" id="transfer-payee" placeholder="Enter recipient name" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
+          </div>
+
+          <div class="flex flex-col gap-space-xs mb-4">
+            <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Bank Name</label>
+            <input type="text" id="transfer-bank" placeholder="Enter bank name" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
           </div>
 
           <div class="flex flex-col gap-space-xs mb-4">
@@ -136,17 +144,12 @@
             </select>
           </div>
 
-          <div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col items-center justify-center text-center mt-4">
+          <div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col items-center justify-center text-center mt-4 mb-4">
             <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider mb-space-xs">Transfer Amount</label>
             <div class="flex items-center justify-center w-full my-space-xs">
               <span class="font-display-hero text-display-hero text-outline font-semibold select-none mr-1">$</span>
               <input class="font-display-hero text-display-hero text-on-surface bg-transparent text-center focus:outline-none max-w-[280px] font-semibold tabular-nums" id="transfer-amount" placeholder="0.00" type="number" step="0.01" value="">
             </div>
-          </div>
-
-          <div class="flex flex-col gap-space-xs mt-4 mb-4">
-            <label class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Transfer PIN</label>
-            <input type="password" id="transfer-pin" placeholder="Enter 4-digit PIN" class="w-full bg-surface-container-low px-4 py-3 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-highest transition-colors shadow-sm" value="">
           </div>
 
           <div>
@@ -180,6 +183,96 @@
       </div>
     </div>
   </div>
+  <div id="pin-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-space-sm sm:p-space-md bg-inverse-surface/40 backdrop-blur-md overflow-y-auto">
+    <div class="w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden my-auto transform transition-all duration-300">
+      <div class="px-space-lg pt-space-lg pb-space-sm flex items-start justify-between">
+        <div class="flex items-center gap-space-md">
+          <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-primary-fixed text-primary">
+            <span class="material-symbols-outlined text-[26px]">verified_user</span>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+            </span>
+          </div>
+          <div>
+            <div class="flex items-center gap-space-xs">
+              <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">Authorize Transfer</h2>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+                <span class="material-symbols-outlined text-[12px] text-secondary">lock</span>
+                Step 2 of 2
+              </span>
+            </div>
+            <p class="font-body-sm text-body-sm text-outline">Confirming outgoing domestic wire transfer</p>
+          </div>
+        </div>
+        <button id="close-modal-btn" aria-label="Cancel transfer authorization" class="w-9 h-9 flex items-center justify-center rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="mx-space-lg my-space-sm bg-surface-container-low rounded-xl p-space-md">
+        <div class="flex items-baseline justify-between mb-space-sm">
+          <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Transfer Amount</span>
+          <div class="text-right">
+            <span class="font-tabular-balance text-tabular-balance text-on-surface font-semibold" id="modal-transfer-amount">$0.00</span>
+            <span class="font-label-sm text-label-sm text-secondary block font-semibold">Fee: $0.00 (Instant RTP)</span>
+          </div>
+        </div>
+        <div class="space-y-space-xs pt-space-xs">
+          <div class="flex items-center justify-between py-1">
+            <span class="font-body-sm text-body-sm text-on-surface-variant">To</span>
+            <div class="flex items-center gap-space-sm">
+              <span class="font-label-md text-label-md text-on-surface font-semibold" id="modal-transfer-payee">---</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-1">
+            <span class="font-body-sm text-body-sm text-on-surface-variant">From</span>
+            <span class="font-label-md text-label-md text-on-surface">Everyday Checking ••4820</span>
+          </div>
+          <div class="flex items-center justify-between py-1">
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Delivery</span>
+            <div class="flex items-center gap-1 text-secondary font-label-sm text-label-sm font-semibold">
+              <span class="material-symbols-outlined text-[16px]">bolt</span>
+              Immediate execution
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="px-space-lg pt-space-sm pb-space-md flex flex-col items-center text-center">
+        <div class="mb-space-md">
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Enter 4-Digit Security PIN</h3>
+          <p class="font-body-sm text-body-sm text-outline mt-0.5">Please provide your personal authorization code</p>
+        </div>
+        <div class="flex items-center justify-center gap-space-sm mb-space-md w-full max-w-xs" id="pinDisplayContainer">
+          <div class="w-11 h-13 py-3 rounded-lg bg-surface-container-low flex items-center justify-center pin-slot" data-index="0"><div class="w-2 h-2 rounded-full bg-outline-variant"></div></div>
+          <div class="w-11 h-13 py-3 rounded-lg bg-surface-container-low flex items-center justify-center pin-slot" data-index="1"><div class="w-2 h-2 rounded-full bg-outline-variant"></div></div>
+          <div class="w-11 h-13 py-3 rounded-lg bg-surface-container-low flex items-center justify-center pin-slot" data-index="2"><div class="w-2 h-2 rounded-full bg-outline-variant"></div></div>
+          <div class="w-11 h-13 py-3 rounded-lg bg-surface-container-low flex items-center justify-center pin-slot" data-index="3"><div class="w-2 h-2 rounded-full bg-outline-variant"></div></div>
+        </div>
+        <div id="modal-error-text" class="text-red-500 text-sm mb-2 hidden">Invalid PIN</div>
+        <div class="grid grid-cols-3 gap-2.5 w-full max-w-xs mx-auto mb-space-sm select-none">
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">1</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">2</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">3</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">4</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">5</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">6</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">7</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">8</button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">9</button>
+          <button aria-label="Use Touch ID or Passkey" class="h-12 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary active:scale-95 transition flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[22px]">fingerprint</span></button>
+          <button class="keypad-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container active:scale-95 transition flex flex-col items-center justify-center text-on-surface font-headline-sm text-headline-sm font-semibold" type="button">0</button>
+          <button aria-label="Backspace" class="backspace-btn h-12 rounded-lg bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface active:scale-95 transition flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[22px]">backspace</span></button>
+        </div>
+      </div>
+      <div class="px-space-lg pb-space-lg flex flex-col sm:flex-row gap-space-sm">
+        <button id="cancel-modal-btn" class="flex-1 order-2 sm:order-1 py-space-sm px-space-md rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-center" type="button">Cancel & Edit Details</button>
+        <button class="flex-1 order-1 sm:order-2 py-space-sm px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md font-semibold transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-space-xs opacity-60 pointer-events-none" id="confirmTransferBtn" type="button">
+          <span>Confirm & Send</span>
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <script type="module">
@@ -209,12 +302,38 @@
     const errorText = document.getElementById('error-text');
     const successMsg = document.getElementById('success-message');
 
+    // Dark mode toggle logic
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const darkModeIcon = document.getElementById('dark-mode-icon');
+    if (darkModeToggle) {
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        darkModeIcon.textContent = 'light_mode';
+      } else {
+        document.documentElement.classList.remove('dark');
+        darkModeIcon.textContent = 'dark_mode';
+      }
+
+      darkModeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        if (document.documentElement.classList.contains('dark')) {
+          localStorage.setItem('theme', 'dark');
+          darkModeIcon.textContent = 'light_mode';
+        } else {
+          localStorage.setItem('theme', 'light');
+          darkModeIcon.textContent = 'dark_mode';
+        }
+      });
+    }
+
     sendBtn.addEventListener('click', async () => {
       errorMsg.classList.add('hidden');
       successMsg.classList.add('hidden');
       
       const amount = parseFloat(amountInput.value);
       const payee = payeeInput.value.trim();
+      const bankInput = document.getElementById('transfer-bank');
+      const bankName = bankInput ? bankInput.value.trim() : '';
       const account = accountInput.value.trim();
       
       if (isNaN(amount) || amount <= 0) {
@@ -228,16 +347,15 @@
         errorMsg.classList.remove('hidden');
         return;
       }
-      
-      if (account === '') {
-        errorText.textContent = "Please enter an account number.";
+
+      if (bankName === '') {
+        errorText.textContent = "Please enter a bank name.";
         errorMsg.classList.remove('hidden');
         return;
       }
-
-      const pinInput = document.getElementById('transfer-pin');
-      if (pinInput && pinInput.value !== '4476') {
-        errorText.textContent = "Invalid Transfer PIN.";
+      
+      if (account === '') {
+        errorText.textContent = "Please enter an account number.";
         errorMsg.classList.remove('hidden');
         return;
       }
@@ -256,28 +374,147 @@
         return;
       }
 
-      // If checks pass, add pending transaction
-      sendBtn.disabled = true;
-      const orig = sendBtn.innerHTML;
-      sendBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px] notranslate" translate="no">sync</span><span>Initiating...</span>';
+      // Show modal
+      const modal = document.getElementById('pin-modal');
+      document.getElementById('modal-transfer-amount').textContent = formatCurrency(amount);
+      document.getElementById('modal-transfer-payee').textContent = payee;
+      modal.classList.remove('hidden');
+      currentPin = [];
+      renderSlots();
+    });
+
+    // PIN Modal Logic
+    const modal = document.getElementById('pin-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+    const confirmBtn = document.getElementById('confirmTransferBtn');
+    const modalErrorText = document.getElementById('modal-error-text');
+    let currentPin = [];
+    const maxDigits = 4;
+
+    function renderSlots() {
+      const container = document.getElementById('pinDisplayContainer');
+      if (!container) return;
+      const slots = container.querySelectorAll('.pin-slot');
+      
+      slots.forEach((slot, index) => {
+        slot.className = 'w-11 h-13 py-3 rounded-lg flex items-center justify-center pin-slot transition-all';
+        slot.innerHTML = '';
+
+        if (index < currentPin.length) {
+          slot.classList.add('bg-surface-container-lowest', 'shadow-sm');
+          const dot = document.createElement('div');
+          dot.className = 'w-3.5 h-3.5 rounded-full bg-primary transition-transform duration-150 scale-100';
+          slot.appendChild(dot);
+        } else if (index === currentPin.length) {
+          slot.classList.add('bg-surface-container-lowest', 'shadow-sm', 'bg-primary-fixed/20');
+          const cursor = document.createElement('div');
+          cursor.className = 'w-0.5 h-5 bg-primary animate-pulse';
+          slot.appendChild(cursor);
+        } else {
+          slot.classList.add('bg-surface-container-low');
+          const placeholderDot = document.createElement('div');
+          placeholderDot.className = 'w-2 h-2 rounded-full bg-outline-variant';
+          slot.appendChild(placeholderDot);
+        }
+      });
+
+      if (confirmBtn) {
+        if (currentPin.length === maxDigits) {
+          confirmBtn.classList.remove('opacity-60', 'pointer-events-none');
+          confirmBtn.classList.add('opacity-100');
+        } else {
+          confirmBtn.classList.add('opacity-60', 'pointer-events-none');
+          confirmBtn.classList.remove('opacity-100');
+        }
+      }
+    }
+
+    document.querySelectorAll('.keypad-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.innerText.trim();
+        if (currentPin.length < maxDigits && /^[0-9]$/.test(val)) {
+          currentPin.push(val);
+          renderSlots();
+          modalErrorText.classList.add('hidden');
+        }
+      });
+    });
+
+    const backspaceBtn = document.querySelector('.backspace-btn');
+    if (backspaceBtn) {
+      backspaceBtn.addEventListener('click', () => {
+        if (currentPin.length > 0) {
+          currentPin.pop();
+          renderSlots();
+          modalErrorText.classList.add('hidden');
+        }
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('hidden')) {
+        if (/^[0-9]$/.test(e.key)) {
+          if (currentPin.length < maxDigits) {
+            currentPin.push(e.key);
+            renderSlots();
+            modalErrorText.classList.add('hidden');
+          }
+        } else if (e.key === 'Backspace') {
+          if (currentPin.length > 0) {
+            currentPin.pop();
+            renderSlots();
+            modalErrorText.classList.add('hidden');
+          }
+        }
+      }
+    });
+
+    const hideModal = () => {
+      modal.classList.add('hidden');
+      currentPin = [];
+      renderSlots();
+      modalErrorText.classList.add('hidden');
+    };
+
+    closeModalBtn.addEventListener('click', hideModal);
+    cancelModalBtn.addEventListener('click', hideModal);
+
+    confirmBtn.addEventListener('click', async () => {
+      if (currentPin.join('') !== '4476') {
+        modalErrorText.classList.remove('hidden');
+        currentPin = [];
+        renderSlots();
+        return;
+      }
+      
+      const amount = parseFloat(amountInput.value);
+      const payee = payeeInput.value.trim();
+      const account = accountInput.value.trim();
+
+      confirmBtn.disabled = true;
+      const orig = confirmBtn.innerHTML;
+      confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span><span>Sending...</span>';
       
       setTimeout(async () => {
         const txId = await addTransaction({
           payee: payee,
           account: account,
-          amount: -Math.abs(amount), // negative for outgoing
+          amount: -Math.abs(amount),
           type: 'outgoing',
           status: 'Pending',
           category: 'Manual Transfer'
         });
         
         if (!txId) {
-          errorText.textContent = 'Unable to submit the transfer. Please try again.';
-          errorMsg.classList.remove('hidden');
-          sendBtn.disabled = false;
-          sendBtn.innerHTML = orig;
+          modalErrorText.textContent = 'Unable to submit the transfer. Please try again.';
+          modalErrorText.classList.remove('hidden');
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = orig;
           return;
         }
+        
+        hideModal();
         successMsg.classList.remove('hidden');
         sendBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] notranslate" translate="no">check_circle</span><span>Transfer Pending Approval</span>';
         sendBtn.classList.remove('bg-primary-container');
