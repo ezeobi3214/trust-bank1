@@ -4,55 +4,66 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Trust Bank - Administrative Control Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script id="tailwind-config">
 tailwind.config = {
-  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        "surface": "#f9f9ff",
-        "on-surface": "#141b2b",
+        "surface": "#f8fafc",
+        "on-surface": "#0f172a",
         "primary": "#004ac6",
         "primary-container": "#2563eb",
         "on-primary": "#ffffff",
-        "surface-container-low": "#f1f3ff",
+        "surface-container-low": "#f1f5f9",
         "surface-container-lowest": "#ffffff",
-        "outline": "#737686",
-        "outline-variant": "#c3c6d7"
+        "outline": "#64748b",
+        "outline-variant": "#cbd5e1"
       },
       fontFamily: {
-        "body-md": ["Manrope"],
-        "headline-lg": ["Manrope"],
-        "display-hero": ["Manrope"]
+        "body-md": ["Manrope", "sans-serif"],
+        "headline-lg": ["Manrope", "sans-serif"]
       }
     }
   }
 };
 </script>
+<style>
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+</style>
 <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen">
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
 
-<header class="fixed top-0 w-full z-50 bg-gray-900 text-white backdrop-blur-xl shadow-md">
-  <div class="h-20 max-w-[1240px] mx-auto px-4 lg:px-8 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center shadow-md">
-        <span class="material-symbols-outlined text-white text-[24px] notranslate" translate="no">admin_panel_settings</span>
+<!-- Top Fixed Header -->
+<header class="fixed top-0 left-0 w-full z-50 bg-slate-900 text-white shadow-md border-b border-slate-800">
+  <div class="h-16 max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center shadow-md flex-shrink-0">
+        <span class="material-symbols-outlined text-white text-[22px] notranslate" translate="no">admin_panel_settings</span>
       </div>
-      <div>
-        <h1 class="text-lg font-bold tracking-tight">Trust Bank Admin</h1>
-        <p class="text-xs text-gray-400">Master Management Console</p>
+      <div class="min-w-0">
+        <h1 class="text-base sm:text-lg font-bold tracking-tight truncate leading-tight">Trust Bank Admin</h1>
+        <p class="text-[11px] text-slate-400 truncate hidden xs:block">Administrative Management Console</p>
       </div>
     </div>
-    <div class="flex items-center gap-4">
-      <a href="admin_chat.html" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
+    
+    <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <a href="admin_chat.html" class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
         <span class="material-symbols-outlined text-[18px] notranslate" translate="no">support_agent</span>
         <span class="hidden sm:inline">Support Chat</span>
       </a>
-      <a href="index.html" class="text-sm text-red-400 hover:text-red-300 font-medium underline flex items-center gap-1">
+      <a href="index.html" class="px-3 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm text-red-400 hover:text-red-300 font-semibold transition flex items-center gap-1 hover:bg-white/5 rounded-lg">
         <span class="material-symbols-outlined text-[18px] notranslate" translate="no">logout</span>
         <span>Logout</span>
       </a>
@@ -60,27 +71,33 @@ tailwind.config = {
   </div>
 </header>
 
-<main class="w-full pt-28 pb-16 bg-surface min-h-screen">
-  <div class="max-w-[1240px] w-full mx-auto px-4 lg:px-8 flex flex-col gap-8">
+<!-- Toast Alert Notification -->
+<div id="admin-toast" class="fixed top-20 right-4 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm font-bold transition-all duration-300">
+  <span class="material-symbols-outlined text-[20px] notranslate" translate="no">check_circle</span>
+  <span id="toast-message">Action successful!</span>
+</div>
+
+<main class="w-full pt-24 pb-16 flex-1">
+  <div class="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
     
-    <!-- Title and Account Tabs -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+    <!-- Top Action Bar & Account Switcher -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
       <div>
-        <span class="text-xs font-bold text-outline uppercase tracking-wider">Configuration &amp; Database Controls</span>
-        <h2 class="text-3xl font-extrabold text-on-surface tracking-tight mt-1">Multi-Account Management</h2>
+        <span class="text-xs font-bold text-outline uppercase tracking-wider">Account Database Management</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight mt-0.5">Control Panel</h2>
       </div>
 
-      <!-- Account Switcher Tabs -->
-      <div class="inline-flex p-1.5 bg-gray-200/80 rounded-xl gap-1.5 self-start md:self-auto">
-        <button id="tab-account1" class="px-4 py-2.5 rounded-lg text-sm font-bold transition-all bg-white text-primary shadow-sm flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
-          <span id="tab-acc1-label">Account 1: Alex</span>
+      <!-- Segmented Tabs for Account 1, Account 2, Admin Security -->
+      <div class="flex flex-wrap p-1.5 bg-slate-200/80 rounded-2xl gap-1.5 w-full md:w-auto shadow-inner">
+        <button id="tab-account1" type="button" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-primary shadow-sm flex items-center justify-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0"></span>
+          <span id="tab-acc1-label">Account 1 (Alex)</span>
         </button>
-        <button id="tab-account2" class="px-4 py-2.5 rounded-lg text-sm font-bold transition-all text-gray-600 hover:text-gray-900 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          <span id="tab-acc2-label">Account 2: Jordan</span>
+        <button id="tab-account2" type="button" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+          <span id="tab-acc2-label">Account 2 (Jordan)</span>
         </button>
-        <button id="tab-admin" class="px-4 py-2.5 rounded-lg text-sm font-bold transition-all text-gray-600 hover:text-gray-900 flex items-center gap-1.5">
+        <button id="tab-admin" type="button" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5">
           <span class="material-symbols-outlined text-[18px] notranslate" translate="no">shield</span>
           <span>Admin Access</span>
         </button>
@@ -88,180 +105,185 @@ tailwind.config = {
     </div>
 
     <!-- Active Account Banner -->
-    <div id="account-status-banner" class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl p-6 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <div id="banner-avatar" class="w-16 h-16 rounded-full overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center text-white flex-shrink-0">
+    <div id="account-status-banner" class="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white rounded-2xl p-5 sm:p-6 shadow-md border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div class="flex items-center gap-4 min-w-0">
+        <div id="banner-avatar" class="w-16 h-16 rounded-full overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center text-white flex-shrink-0 shadow-sm">
           <span class="material-symbols-outlined text-[36px] notranslate" translate="no">person</span>
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h3 class="text-xl font-bold" id="banner-name">Alex Morgan</h3>
-            <span id="banner-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/30 text-blue-200 border border-blue-400/30">Account 1</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 class="text-lg sm:text-xl font-bold truncate text-white" id="banner-name">Alex Morgan</h3>
+            <span id="banner-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/30 text-blue-200 border border-blue-400/30 flex-shrink-0">Account 1</span>
           </div>
-          <p class="text-sm text-gray-300 mt-0.5">Login Username: <strong class="text-white font-mono" id="banner-login-email">@trustbank25</strong></p>
+          <p class="text-xs sm:text-sm text-slate-300 mt-0.5 truncate">
+            Sign-in Username: <strong class="text-amber-300 font-mono" id="banner-login-email">@trustbank25</strong>
+          </p>
         </div>
       </div>
-      <div class="flex items-center gap-6 sm:border-l sm:border-white/20 sm:pl-6">
-        <div>
-          <span class="text-xs uppercase tracking-wider text-gray-300">Live Balance</span>
-          <p class="text-2xl font-bold font-mono text-emerald-400" id="banner-balance">$0.00</p>
+
+      <!-- Quick Balance & Limit Metrics -->
+      <div class="grid grid-cols-2 gap-2.5 sm:gap-4 md:border-l md:border-white/15 md:pl-6 w-full md:w-auto">
+        <div class="bg-white/10 p-3 sm:px-4 sm:py-2.5 rounded-xl border border-white/10 min-w-0">
+          <span class="text-[11px] uppercase tracking-wider text-slate-300 font-semibold block leading-tight truncate">Live Balance</span>
+          <p class="text-base sm:text-xl font-bold font-mono text-emerald-400 mt-1 leading-tight truncate" id="banner-balance">$0.00</p>
         </div>
-        <div>
-          <span class="text-xs uppercase tracking-wider text-gray-300">Transfer Limit</span>
-          <p class="text-2xl font-bold font-mono text-amber-300" id="banner-limit">$0.00</p>
+        <div class="bg-white/10 p-3 sm:px-4 sm:py-2.5 rounded-xl border border-white/10 min-w-0">
+          <span class="text-[11px] uppercase tracking-wider text-slate-300 font-semibold block leading-tight truncate">Transfer Limit</span>
+          <p class="text-base sm:text-xl font-bold font-mono text-amber-300 mt-1 leading-tight truncate" id="banner-limit">$0.00</p>
         </div>
       </div>
     </div>
 
-    <!-- Account Details Form Panels -->
-    <div id="user-account-panels" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Account Details Form Panels (Account 1 / Account 2) -->
+    <div id="user-account-panels" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <!-- Left Column: Credentials & Financials (4 cols) -->
-      <div class="lg:col-span-5 flex flex-col gap-6">
+      <!-- Left Column: Credentials & Financials (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col gap-6 min-w-0">
         
         <!-- Login Credentials Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-6 flex flex-col gap-4">
-          <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-            <h3 class="font-bold text-lg text-on-surface flex items-center gap-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-bold text-base sm:text-lg text-on-surface flex items-center gap-2">
               <span class="material-symbols-outlined text-primary notranslate" translate="no">vpn_key</span>
-              <span>Login Credentials</span>
+              <span>Sign-in Credentials</span>
             </h3>
-            <span class="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-700 rounded-md">Used at Sign-in</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md border border-blue-200">Login Page Details</span>
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase text-outline mb-1.5">Login Username / Email</label>
-            <input type="text" id="acc-login-email" class="w-full bg-surface-container-low px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-primary font-mono text-sm">
-            <p class="text-xs text-outline mt-1">This is what the user enters on the login page.</p>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Login Username or Email</label>
+            <input type="text" id="acc-login-email" class="w-full bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-mono text-sm font-semibold text-slate-900 transition">
+            <p class="text-[11px] text-slate-500 mt-1">What the user enters in the login box to access this exact account.</p>
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase text-outline mb-1.5">Login Password</label>
-            <div class="relative">
-              <input type="text" id="acc-login-pass" class="w-full bg-surface-container-low px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-primary font-mono text-sm">
-            </div>
-            <p class="text-xs text-outline mt-1">Plain-text password for this account.</p>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Login Password</label>
+            <input type="text" id="acc-login-pass" class="w-full bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-mono text-sm font-semibold text-slate-900 transition">
+            <p class="text-[11px] text-slate-500 mt-1">Plain password required at sign in.</p>
           </div>
 
-          <button id="save-credentials-btn" class="w-full py-2.5 px-4 bg-primary hover:bg-primary-container text-white rounded-xl font-bold text-sm shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-1.5">
+          <button type="button" id="save-credentials-btn" class="w-full py-2.5 px-4 bg-primary hover:bg-primary-container text-white rounded-xl font-bold text-sm shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-1.5 mt-1">
             <span class="material-symbols-outlined text-[18px] notranslate" translate="no">save</span>
             <span>Update Credentials</span>
           </button>
         </div>
 
         <!-- Financial Balance & Limit Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-6 flex flex-col gap-4">
-          <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-            <h3 class="font-bold text-lg text-on-surface flex items-center gap-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-bold text-base sm:text-lg text-on-surface flex items-center gap-2">
               <span class="material-symbols-outlined text-emerald-600 notranslate" translate="no">account_balance_wallet</span>
-              <span>Account Financials</span>
+              <span>Financial Balances</span>
             </h3>
-            <span class="text-xs font-semibold px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md">Live Balance</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-200">Account Specific</span>
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase text-outline mb-1.5">Current Balance ($ USD)</label>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Liquid Balance ($ USD)</label>
             <div class="relative">
-              <span class="absolute left-3.5 top-2.5 text-gray-500 font-bold">$</span>
-              <input type="number" step="0.01" id="acc-balance" class="w-full bg-surface-container-low pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-emerald-600 font-mono text-base font-bold">
+              <span class="absolute left-3.5 top-2.5 text-slate-400 font-bold">$</span>
+              <input type="number" step="0.01" id="acc-balance" class="w-full bg-slate-50 pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-mono text-base font-bold text-slate-900 transition">
             </div>
+            <p class="text-[11px] text-slate-500 mt-1">Visible on user's dashboard and available for transfers.</p>
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase text-outline mb-1.5">Max Transfer Limit ($ USD)</label>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Max Transfer Limit ($ USD)</label>
             <div class="relative">
-              <span class="absolute left-3.5 top-2.5 text-gray-500 font-bold">$</span>
-              <input type="number" step="0.01" id="acc-limit" class="w-full bg-surface-container-low pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-amber-600 font-mono text-base font-bold">
+              <span class="absolute left-3.5 top-2.5 text-slate-400 font-bold">$</span>
+              <input type="number" step="0.01" id="acc-limit" class="w-full bg-slate-50 pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 font-mono text-base font-bold text-slate-900 transition">
             </div>
+            <p class="text-[11px] text-slate-500 mt-1">Maximum amount permitted per transaction for this account.</p>
           </div>
 
-          <button id="save-financials-btn" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-1.5">
+          <button type="button" id="save-financials-btn" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-1.5 mt-1">
             <span class="material-symbols-outlined text-[18px] notranslate" translate="no">currency_exchange</span>
-            <span>Save Financials</span>
+            <span>Update Financials</span>
           </button>
         </div>
 
       </div>
 
       <!-- Right Column: Profile & Avatar Card (7 cols) -->
-      <div class="lg:col-span-7 flex flex-col gap-6">
+      <div class="lg:col-span-7 flex flex-col gap-6 min-w-0">
         
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-6 flex flex-col gap-5">
-          <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-            <h3 class="font-bold text-lg text-on-surface flex items-center gap-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col gap-5">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-bold text-base sm:text-lg text-on-surface flex items-center gap-2">
               <span class="material-symbols-outlined text-purple-600 notranslate" translate="no">badge</span>
               <span>Profile &amp; Personal Info</span>
             </h3>
-            <span class="text-xs font-semibold px-2 py-1 bg-purple-50 text-purple-700 rounded-md">Account-Specific</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 bg-purple-50 text-purple-700 rounded-md border border-purple-200">Only For This Account</span>
           </div>
 
           <!-- Profile Picture (Avatar) -->
-          <div class="p-4 bg-surface-container-low rounded-xl flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5 min-w-0">
               <div id="prof-avatar-preview" class="w-16 h-16 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white border-2 border-white shadow-sm flex-shrink-0">
                 <span class="material-symbols-outlined text-[32px] notranslate" translate="no">person</span>
               </div>
-              <div>
-                <p class="font-bold text-sm text-on-surface">Profile Picture (Avatar)</p>
-                <p class="text-xs text-outline">Stored solely for this account. Does not affect the other account.</p>
+              <div class="min-w-0">
+                <p class="font-bold text-sm text-slate-900">Profile Picture (Avatar)</p>
+                <p class="text-xs text-slate-500 mt-0.5">Isolated to this account only. Does not leak to the other account.</p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
-              <label class="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg cursor-pointer hover:bg-primary-container transition shadow-sm">
+            <div class="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+              <label class="px-3.5 py-2 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-lg cursor-pointer transition shadow-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px] notranslate" translate="no">upload</span>
                 <span>Upload</span>
                 <input type="file" id="prof-avatar-file" accept="image/*" class="hidden">
               </label>
-              <button type="button" id="prof-avatar-remove" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold rounded-lg transition">
+              <button type="button" id="prof-avatar-remove" class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold rounded-lg transition">
                 Remove
               </button>
             </div>
           </div>
 
           <!-- Profile Fields Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold uppercase text-outline mb-1">Full Legal Name</label>
-              <input type="text" id="prof-name" class="w-full bg-surface-container-low px-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-primary text-sm font-medium">
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Full Legal Name</label>
+              <input type="text" id="prof-name" class="w-full bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 outline-none focus:border-primary text-sm font-medium transition">
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-outline mb-1">Date of Birth</label>
-              <input type="text" id="prof-dob" class="w-full bg-surface-container-low px-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-primary text-sm font-medium">
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Date of Birth</label>
+              <input type="text" id="prof-dob" class="w-full bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 outline-none focus:border-primary text-sm font-medium transition">
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-outline mb-1">Contact Email Address</label>
-              <input type="email" id="prof-email" class="w-full bg-surface-container-low px-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-primary text-sm font-medium">
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Contact Email Address</label>
+              <input type="email" id="prof-email" class="w-full bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 outline-none focus:border-primary text-sm font-medium transition">
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-outline mb-1">Primary Phone</label>
-              <input type="text" id="prof-phone" class="w-full bg-surface-container-low px-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-primary text-sm font-medium">
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Primary Phone</label>
+              <input type="text" id="prof-phone" class="w-full bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 outline-none focus:border-primary text-sm font-medium transition">
             </div>
-            <div class="md:col-span-2">
-              <label class="block text-xs font-bold uppercase text-outline mb-1">Residential Address</label>
-              <input type="text" id="prof-address" class="w-full bg-surface-container-low px-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-primary text-sm font-medium">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Residential Address</label>
+              <input type="text" id="prof-address" class="w-full bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 outline-none focus:border-primary text-sm font-medium transition">
             </div>
           </div>
 
-          <!-- Banking Account Numbers -->
-          <div class="pt-3 border-t border-gray-100">
-            <h4 class="text-xs font-bold uppercase text-outline mb-3">Linked Banking Routing &amp; Accounts</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Linked Banking Routing & Accounts -->
+          <div class="pt-3 border-t border-slate-100">
+            <h4 class="text-xs font-bold uppercase text-slate-600 mb-3">Linked Banking Routing &amp; Accounts</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label class="block text-[11px] font-semibold text-outline mb-1">Checking Number</label>
-                <input type="text" id="prof-checking" class="w-full bg-surface-container-low px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-primary font-mono text-xs">
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Checking Number</label>
+                <input type="text" id="prof-checking" class="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-primary font-mono text-xs font-semibold transition">
               </div>
               <div>
-                <label class="block text-[11px] font-semibold text-outline mb-1">Routing Number</label>
-                <input type="text" id="prof-routing" class="w-full bg-surface-container-low px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-primary font-mono text-xs">
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Routing Number</label>
+                <input type="text" id="prof-routing" class="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-primary font-mono text-xs font-semibold transition">
               </div>
               <div>
-                <label class="block text-[11px] font-semibold text-outline mb-1">Savings Number</label>
-                <input type="text" id="prof-savings" class="w-full bg-surface-container-low px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-primary font-mono text-xs">
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Savings Number</label>
+                <input type="text" id="prof-savings" class="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-primary font-mono text-xs font-semibold transition">
               </div>
             </div>
           </div>
 
           <div class="flex justify-end pt-2">
-            <button id="save-profile-btn" class="py-2.5 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm shadow-sm transition active:scale-[0.99] flex items-center gap-2">
+            <button type="button" id="save-profile-btn" class="py-2.5 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm shadow-sm transition active:scale-[0.99] flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px] notranslate" translate="no">verified</span>
               <span>Save Profile Changes</span>
             </button>
@@ -271,28 +293,28 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- Admin Credentials Panel (Shown when Admin tab selected) -->
-    <div id="admin-security-panel" class="hidden bg-white rounded-2xl shadow-sm border border-gray-200 p-8 max-w-xl mx-auto w-full">
-      <div class="flex items-center gap-3 pb-4 border-b border-gray-100 mb-6">
-        <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center">
+    <!-- Admin System Credentials Panel (Shown when Admin tab selected) -->
+    <div id="admin-security-panel" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 max-w-xl mx-auto w-full">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 mb-6">
+        <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
           <span class="material-symbols-outlined text-[28px] notranslate" translate="no">security</span>
         </div>
         <div>
-          <h3 class="text-xl font-bold text-on-surface">Admin System Access</h3>
+          <h3 class="text-lg sm:text-xl font-bold text-on-surface">Admin System Access</h3>
           <p class="text-xs text-outline">Manage master administrator login credentials</p>
         </div>
       </div>
 
       <div class="flex flex-col gap-4">
         <div>
-          <label class="block text-xs font-bold uppercase text-outline mb-1.5">Admin Username / Email</label>
-          <input type="text" id="admin-email-input" class="w-full bg-surface-container-low px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-red-600 font-mono text-sm">
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Admin Username / Email</label>
+          <input type="text" id="admin-email-input" class="w-full bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-red-600 font-mono text-sm font-semibold transition">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase text-outline mb-1.5">Admin Password</label>
-          <input type="text" id="admin-pass-input" class="w-full bg-surface-container-low px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-red-600 font-mono text-sm">
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Admin Password</label>
+          <input type="text" id="admin-pass-input" class="w-full bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-red-600 font-mono text-sm font-semibold transition">
         </div>
-        <button id="save-admin-creds-btn" class="mt-2 py-3 px-6 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2">
+        <button type="button" id="save-admin-creds-btn" class="mt-2 py-3 px-6 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-[20px] notranslate" translate="no">lock_reset</span>
           <span>Update Admin Credentials</span>
         </button>
@@ -300,28 +322,28 @@ tailwind.config = {
     </div>
 
     <!-- Pending Transfers Across Both Accounts -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-6 lg:p-8 flex flex-col gap-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 lg:p-8 flex flex-col gap-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div>
-          <h3 class="text-xl font-bold text-on-surface flex items-center gap-2">
+          <h3 class="text-lg sm:text-xl font-bold text-on-surface flex items-center gap-2">
             <span class="material-symbols-outlined text-amber-500 notranslate" translate="no">pending_actions</span>
             <span>Pending Outgoing Transfers</span>
           </h3>
-          <p class="text-xs text-outline mt-0.5">Review and approve transfers submitted from any account.</p>
+          <p class="text-xs text-outline mt-0.5">Approve or block outgoing money transfers initiated by any account.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="clear-tx-btn" class="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" id="clear-tx-btn" class="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] notranslate" translate="no">delete_sweep</span>
-            <span>Clear Transactions</span>
+            <span>Clear All Transactions</span>
           </button>
-          <button id="clear-chat-btn" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
+          <button type="button" id="clear-chat-btn" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] notranslate" translate="no">cleaning_services</span>
             <span>Clear Chat</span>
           </button>
         </div>
       </div>
 
-      <div class="flex flex-col gap-3" id="pending-list">
+      <div class="flex flex-col gap-3 min-w-0" id="pending-list">
         <p class="text-outline text-sm italic py-4">Loading pending transfers...</p>
       </div>
     </div>
@@ -358,10 +380,21 @@ tailwind.config = {
   const adminPanel = document.getElementById('admin-security-panel');
   const accountBanner = document.getElementById('account-status-banner');
 
+  function showToast(msg) {
+    const toast = document.getElementById('admin-toast');
+    const toastMsg = document.getElementById('toast-message');
+    if (!toast || !toastMsg) return;
+    toastMsg.textContent = msg;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3500);
+  }
+
   function setTab(tabKey) {
     [tabAcc1, tabAcc2, tabAdmin].forEach(b => {
-      b.classList.remove('bg-white', 'text-primary', 'shadow-sm', 'text-gray-900');
-      b.classList.add('text-gray-600');
+      b.classList.remove('bg-white', 'text-primary', 'text-emerald-700', 'text-red-600', 'shadow-sm');
+      b.classList.add('text-slate-600');
     });
 
     if (tabKey === 'account1') {
@@ -396,8 +429,8 @@ tailwind.config = {
     document.getElementById('banner-login-email').textContent = acc.email || (isAcc1 ? '@trustbank25' : '@trustbank26');
     document.getElementById('banner-badge').textContent = isAcc1 ? 'Account 1' : 'Account 2';
     document.getElementById('banner-badge').className = isAcc1
-      ? 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/30 text-blue-200 border border-blue-400/30'
-      : 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30';
+      ? 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/30 text-blue-200 border border-blue-400/30 flex-shrink-0'
+      : 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 flex-shrink-0';
     
     document.getElementById('banner-balance').textContent = formatCurrency(acc.balance || 0);
     document.getElementById('banner-limit').textContent = formatCurrency(acc.transferLimit || 0);
@@ -478,6 +511,7 @@ tailwind.config = {
           ctx.drawImage(img, 0, 0, width, height);
           currentAvatarDataUrl = canvas.toDataURL('image/jpeg', 0.85);
           updateAvatarPreview(currentAvatarDataUrl);
+          showToast("Profile image loaded. Click 'Save Profile Changes' to persist.");
         };
         img.src = event.target.result;
       };
@@ -488,6 +522,7 @@ tailwind.config = {
   document.getElementById('prof-avatar-remove').addEventListener('click', () => {
     currentAvatarDataUrl = '';
     updateAvatarPreview('');
+    showToast("Profile image cleared. Click 'Save Profile Changes' to persist.");
   });
 
   // SAVE CREDENTIALS BUTTON
@@ -495,11 +530,11 @@ tailwind.config = {
     const email = document.getElementById('acc-login-email').value.trim();
     const pass = document.getElementById('acc-login-pass').value.trim();
     if (!email || !pass) {
-      alert("Please provide both login username/email and password.");
+      alert("Please provide both sign-in username/email and password.");
       return;
     }
     await updateAccountCredentials(currentEditingAccount, { email, password: pass });
-    alert(`Login credentials for ${currentEditingAccount === 'account1' ? 'Account 1' : 'Account 2'} updated successfully!`);
+    showToast(`Login credentials for ${currentEditingAccount === 'account1' ? 'Account 1' : 'Account 2'} saved!`);
     await refreshData();
   });
 
@@ -512,7 +547,7 @@ tailwind.config = {
       return;
     }
     await updateFinancials(bal, lim, currentEditingAccount);
-    alert(`Financials for ${currentEditingAccount === 'account1' ? 'Account 1' : 'Account 2'} updated!`);
+    showToast(`Financials for ${currentEditingAccount === 'account1' ? 'Account 1' : 'Account 2'} updated!`);
     await refreshData();
   });
 
@@ -533,7 +568,7 @@ tailwind.config = {
     };
 
     await updateAccount(currentEditingAccount, { profile: updatedProfile });
-    alert(`Profile for ${currentEditingAccount === 'account1' ? 'Account 1' : 'Account 2'} saved!`);
+    showToast(`Profile details for ${currentEditingAccount === 'account1' ? 'Account 1' : 'Account 2'} saved!`);
     await refreshData();
   });
 
@@ -546,7 +581,7 @@ tailwind.config = {
       return;
     }
     await updateAdminCredentials({ email, password: pass });
-    alert("Admin credentials updated successfully!");
+    showToast("Master admin credentials updated!");
   });
 
   // PENDING TRANSFERS
@@ -562,29 +597,29 @@ tailwind.config = {
     container.innerHTML = '';
     txs.forEach(tx => {
       const isAcc1 = tx.accountId === 'account1';
-      const badgeClass = isAcc1 ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800';
+      const badgeClass = isAcc1 ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200';
       const badgeLabel = isAcc1 ? 'Account 1' : 'Account 2';
 
       const el = document.createElement('div');
-      el.className = "flex flex-col md:flex-row md:items-center justify-between p-4 bg-surface-container-low rounded-xl border border-gray-200/70 gap-4";
+      el.className = "flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 gap-4 transition min-w-0";
       el.innerHTML = `
-        <div class="flex items-start sm:items-center gap-3.5">
-          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+        <div class="flex items-start gap-3.5 min-w-0 flex-1">
+          <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
             <span class="material-symbols-outlined text-[24px] notranslate" translate="no">pending</span>
           </div>
-          <div>
+          <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full ${badgeClass}">${badgeLabel}: ${tx.accountName || 'User'}</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full border ${badgeClass}">${badgeLabel}: ${tx.accountName || 'User'}</span>
               <span class="text-xs text-outline font-mono">${tx.date}</span>
             </div>
-            <p class="font-bold text-base text-on-surface mt-1">To: ${tx.payee} ${tx.account ? `(${tx.account})` : ''}</p>
-            <p class="text-xs text-outline">Ref: <span class="font-mono">${tx.id}</span></p>
+            <p class="font-bold text-sm sm:text-base text-on-surface mt-1 truncate">To: ${tx.payee} ${tx.account ? `(${tx.account})` : ''}</p>
+            <p class="text-[11px] text-outline font-mono">Ref: ${tx.id}</p>
           </div>
         </div>
-        <div class="flex items-center justify-between md:justify-end gap-5">
-          <div class="text-right">
-            <p class="text-xl font-bold font-mono text-on-surface">${formatCurrency(Math.abs(tx.amount))}</p>
-            <p class="text-xs text-amber-600 font-semibold">Awaiting Approval</p>
+        <div class="flex items-center justify-between sm:justify-end gap-4 flex-shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0">
+          <div class="text-left sm:text-right">
+            <p class="text-lg sm:text-xl font-bold font-mono text-on-surface">${formatCurrency(Math.abs(tx.amount))}</p>
+            <p class="text-[11px] text-amber-600 font-semibold">Awaiting Approval</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="window.approveTransfer('${tx.id}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
@@ -605,6 +640,7 @@ tailwind.config = {
   window.approveTransfer = async (id) => {
     if (confirm("Approve this transfer? Funds will be deducted from this user's balance.")) {
       await updateTransactionStatus(id, 'Approved');
+      showToast("Transfer approved and balance adjusted.");
       await refreshData();
     }
   };
@@ -612,6 +648,7 @@ tailwind.config = {
   window.blockTransfer = async (id) => {
     if (confirm("Block this transfer? Status will be updated to Blocked.")) {
       await updateTransactionStatus(id, 'Blocked');
+      showToast("Transfer marked as Blocked.");
       await refreshData();
     }
   };
@@ -620,7 +657,7 @@ tailwind.config = {
   document.getElementById('clear-tx-btn').addEventListener('click', async () => {
     if (confirm("Are you sure you want to delete all transactions across both accounts? This cannot be undone.")) {
       await clearTransactions();
-      alert("All transactions cleared.");
+      showToast("All transactions cleared.");
       await refreshData();
     }
   });
@@ -628,7 +665,7 @@ tailwind.config = {
   document.getElementById('clear-chat-btn').addEventListener('click', async () => {
     if (confirm("Are you sure you want to clear all support chat messages?")) {
       await clearMessages();
-      alert("Chat messages cleared.");
+      showToast("Support chat messages cleared.");
     }
   });
 
@@ -637,8 +674,8 @@ tailwind.config = {
     const acc1 = cachedAccounts.account1 || {};
     const acc2 = cachedAccounts.account2 || {};
 
-    document.getElementById('tab-acc1-label').textContent = `Account 1: ${(acc1.profile?.name || 'Alex').split(' ')[0]}`;
-    document.getElementById('tab-acc2-label').textContent = `Account 2: ${(acc2.profile?.name || 'Jordan').split(' ')[0]}`;
+    document.getElementById('tab-acc1-label').textContent = `Account 1 (${(acc1.profile?.name || 'Alex').split(' ')[0]})`;
+    document.getElementById('tab-acc2-label').textContent = `Account 2 (${(acc2.profile?.name || 'Jordan').split(' ')[0]})`;
 
     const passwords = await getPasswords();
     if (passwords.adminPass) {
@@ -664,9 +701,13 @@ tailwind.config = {
     }
   });
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    await refreshData();
-  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      refreshData();
+    });
+  } else {
+    refreshData();
+  }
 </script>
 
 <!-- Moveable Translation Widget -->

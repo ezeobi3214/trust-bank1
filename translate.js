@@ -1,6 +1,6 @@
 /**
  * Trust Bank Draggable Translation Widget
- * Supports full mouse & touch drag-and-drop to anywhere on the screen with persistent position.
+ * Supports full pointer, mouse & touch drag-and-drop to anywhere on the screen with persistent position.
  */
 
 (function () {
@@ -136,46 +136,48 @@
       body { top: 0 !important; }
       .goog-te-combo { display: none !important; }
       #custom-translate-widget {
-        position: fixed;
-        z-index: 99999;
+        position: fixed !important;
+        z-index: 999999 !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        user-select: none;
-        -webkit-user-select: none;
-        touch-action: none;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        touch-action: none !important;
       }
       #translate-btn {
-        width: 50px;
-        height: 50px;
+        width: 54px;
+        height: 54px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #004ac6, #1d4ed8);
+        background: linear-gradient(135deg, #004ac6, #2563eb);
         color: white;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 16px rgba(0, 74, 198, 0.4), 0 2px 8px rgba(0,0,0,0.25);
         cursor: grab;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
-        touch-action: none;
+        touch-action: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
       }
       #translate-btn:active {
-        cursor: grabbing;
-        transform: scale(0.96);
+        cursor: grabbing !important;
+        transform: scale(0.94);
       }
       #translate-btn:hover {
-        box-shadow: 0 6px 18px rgba(0, 74, 198, 0.4);
+        box-shadow: 0 6px 22px rgba(0, 74, 198, 0.55);
       }
       #translate-menu {
         display: none;
         position: absolute;
         background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        width: 230px;
+        border-radius: 14px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 240px;
         max-height: 340px;
         overflow-y: auto;
         border: 1px solid #e2e8f0;
-        z-index: 100000;
+        z-index: 1000000;
       }
       #translate-menu::-webkit-scrollbar { width: 5px; }
       #translate-menu::-webkit-scrollbar-track { background: #f8fafc; }
@@ -192,6 +194,9 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1;
       }
       .translate-option {
         padding: 10px 14px;
@@ -227,12 +232,12 @@
       <div id="translate-menu" class="notranslate" translate="no">
         <div class="translate-menu-header">
           <span>Select Language</span>
-          <span style="font-size: 10px; font-weight: normal; color: #94a3b8;">(Drag icon to move)</span>
+          <span style="font-size: 10px; font-weight: normal; color: #94a3b8;">(Drag to move)</span>
         </div>
         <div id="translate-options-container"></div>
       </div>
-      <button id="translate-btn" class="notranslate" translate="no" title="Change Language (Drag anywhere to move)" aria-label="Translate Website">
-        <span class="material-symbols-outlined notranslate" translate="no" style="font-size: 24px; color: #ffffff; pointer-events: none;">translate</span>
+      <button id="translate-btn" class="notranslate" translate="no" title="Change Language (Drag anywhere on screen)" aria-label="Translate Website">
+        <span class="material-symbols-outlined notranslate" translate="no" style="font-size: 26px; color: #ffffff; pointer-events: none;">translate</span>
       </button>
     `;
 
@@ -271,10 +276,11 @@
     // ==========================================
     // POSITION PERSISTENCE & POSITIONING LOGIC
     // ==========================================
+    const btnSize = 54;
+    const margin = 16;
+
     function applySavedPosition() {
       const savedPos = localStorage.getItem('tb_translate_pos');
-      const btnSize = 50;
-      const margin = 16;
       let x, y;
 
       if (savedPos) {
@@ -285,15 +291,18 @@
         } catch (e) {}
       }
 
-      // Default bottom-right if no position saved or out-of-bounds
+      const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+      const vh = window.innerHeight || document.documentElement.clientHeight || 640;
+
+      // Default bottom-right if no position saved or invalid
       if (x === undefined || y === undefined || isNaN(x) || isNaN(y)) {
-        x = window.innerWidth - btnSize - margin;
-        y = window.innerHeight - btnSize - margin;
+        x = vw - btnSize - margin;
+        y = vh - btnSize - margin;
       }
 
       // Clamp to current viewport
-      x = Math.max(margin, Math.min(x, window.innerWidth - btnSize - margin));
-      y = Math.max(margin, Math.min(y, window.innerHeight - btnSize - margin));
+      x = Math.max(8, Math.min(x, vw - btnSize - 8));
+      y = Math.max(8, Math.min(y, vh - btnSize - 8));
 
       widget.style.left = x + 'px';
       widget.style.top = y + 'px';
@@ -307,71 +316,96 @@
     function updateMenuPlacement() {
       const rect = widget.getBoundingClientRect();
       const menuHeight = 340;
-      const menuWidth = 230;
+      const menuWidth = 240;
+      const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+      const vh = window.innerHeight || document.documentElement.clientHeight || 640;
 
       // Vertical placement: upward or downward
       if (rect.top > menuHeight + 20) {
-        menu.style.bottom = '58px';
+        menu.style.bottom = '64px';
         menu.style.top = 'auto';
       } else {
-        menu.style.top = '58px';
+        menu.style.top = '64px';
         menu.style.bottom = 'auto';
       }
 
       // Horizontal placement: right-aligned or left-aligned
-      if (rect.left < menuWidth) {
-        menu.style.left = '0px';
-        menu.style.right = 'auto';
-      } else {
+      if (rect.left + menuWidth > vw) {
         menu.style.right = '0px';
         menu.style.left = 'auto';
+      } else {
+        menu.style.left = '0px';
+        menu.style.right = 'auto';
       }
     }
 
     // ==========================================
-    // DRAGGABLE LOGIC (MOUSE & TOUCH)
+    // BULLETPROOF DRAGGING LOGIC (POINTER + TOUCH + MOUSE)
     // ==========================================
     let isDragging = false;
-    let dragThresholdPassed = false;
+    let hasMoved = false;
     let startX = 0;
     let startY = 0;
     let initialLeft = 0;
     let initialTop = 0;
+    let dragSuppressClickUntil = 0;
 
-    function onStart(clientX, clientY) {
+    function startDrag(clientX, clientY, pointerId) {
       isDragging = true;
-      dragThresholdPassed = false;
+      hasMoved = false;
       startX = clientX;
       startY = clientY;
+
       const rect = widget.getBoundingClientRect();
       initialLeft = rect.left;
       initialTop = rect.top;
+
       btn.style.cursor = 'grabbing';
+
+      if (pointerId !== undefined && btn.setPointerCapture) {
+        try {
+          btn.setPointerCapture(pointerId);
+        } catch (_) {}
+      }
+
+      // Add window-level move & up listeners to track everywhere
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup', onPointerUp, { passive: false });
+      window.addEventListener('pointercancel', onPointerUp, { passive: false });
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd, { passive: false });
+      window.addEventListener('touchcancel', onTouchEnd, { passive: false });
+      window.addEventListener('mousemove', onMouseMove, { passive: false });
+      window.addEventListener('mouseup', onMouseUp, { passive: false });
     }
 
-    function onMove(clientX, clientY, e) {
+    function doMove(clientX, clientY, e) {
       if (!isDragging) return;
 
       const deltaX = clientX - startX;
       const deltaY = clientY - startY;
 
-      if (!dragThresholdPassed) {
-        if (Math.hypot(deltaX, deltaY) > 5) {
-          dragThresholdPassed = true;
-          menu.style.display = 'none'; // Close menu when dragging starts
+      if (!hasMoved) {
+        if (Math.hypot(deltaX, deltaY) > 4) {
+          hasMoved = true;
+          menu.style.display = 'none'; // Close menu while dragging
         }
       }
 
-      if (dragThresholdPassed) {
-        if (e && e.cancelable) e.preventDefault();
+      if (hasMoved) {
+        if (e && e.cancelable) {
+          e.preventDefault();
+        }
 
-        const btnSize = 50;
+        const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+        const vh = window.innerHeight || document.documentElement.clientHeight || 640;
+
         let newX = initialLeft + deltaX;
         let newY = initialTop + deltaY;
 
-        // Viewport bounds
-        newX = Math.max(8, Math.min(newX, window.innerWidth - btnSize - 8));
-        newY = Math.max(8, Math.min(newY, window.innerHeight - btnSize - 8));
+        // Viewport bounds clamping
+        newX = Math.max(8, Math.min(newX, vw - btnSize - 8));
+        newY = Math.max(8, Math.min(newY, vh - btnSize - 8));
 
         widget.style.left = newX + 'px';
         widget.style.top = newY + 'px';
@@ -380,27 +414,89 @@
       }
     }
 
-    function onEnd() {
+    function endDrag(pointerId) {
       if (!isDragging) return;
       isDragging = false;
       btn.style.cursor = 'grab';
 
-      if (dragThresholdPassed) {
+      // Clean up window listeners
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+
+      if (pointerId !== undefined && btn.releasePointerCapture) {
+        try {
+          btn.releasePointerCapture(pointerId);
+        } catch (_) {}
+      }
+
+      if (hasMoved) {
+        dragSuppressClickUntil = Date.now() + 350;
         const rect = widget.getBoundingClientRect();
         localStorage.setItem('tb_translate_pos', JSON.stringify({
           x: Math.round(rect.left),
           y: Math.round(rect.top)
         }));
-        setTimeout(() => {
-          dragThresholdPassed = false;
-        }, 80);
       }
     }
 
-    // Button Click: Only toggle if not dragged
+    // Pointer events handlers
+    function onPointerDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      startDrag(e.clientX, e.clientY, e.pointerId);
+    }
+    function onPointerMove(e) {
+      doMove(e.clientX, e.clientY, e);
+    }
+    function onPointerUp(e) {
+      endDrag(e.pointerId);
+    }
+
+    // Touch events handlers
+    function onTouchStart(e) {
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        startDrag(t.clientX, t.clientY);
+      }
+    }
+    function onTouchMove(e) {
+      if (e.touches.length > 0) {
+        const t = e.touches[0];
+        doMove(t.clientX, t.clientY, e);
+      }
+    }
+    function onTouchEnd() {
+      endDrag();
+    }
+
+    // Mouse events handlers
+    function onMouseDown(e) {
+      if (e.button !== 0) return;
+      startDrag(e.clientX, e.clientY);
+    }
+    function onMouseMove(e) {
+      doMove(e.clientX, e.clientY, e);
+    }
+    function onMouseUp() {
+      endDrag();
+    }
+
+    btn.addEventListener('pointerdown', onPointerDown);
+    // Fallback for non-pointer browsers
+    if (!window.PointerEvent) {
+      btn.addEventListener('touchstart', onTouchStart, { passive: false });
+      btn.addEventListener('mousedown', onMouseDown);
+    }
+
+    // Toggle menu
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (dragThresholdPassed) {
+      if (hasMoved || Date.now() < dragSuppressClickUntil) {
         return;
       }
       updateMenuPlacement();
@@ -414,7 +510,7 @@
       }
     });
 
-    // Google Translate script init
+    // Google Translate script initialization
     window.googleTranslateElementInit = function () {
       new google.translate.TranslateElement({
         pageLanguage: 'en',

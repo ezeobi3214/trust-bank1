@@ -118,23 +118,27 @@
           return;
         }
 
-        // 2. Account 1 Login (matches account1 email OR legacy tb_user_email)
+        const inputEmail = email.trim().toLowerCase();
+
+        // 2. Account 1 Login (matches account1 email, profile email, OR legacy tb_user_email)
         const acc1 = accounts.account1 || {};
         const acc1Email = (acc1.email || data.tb_user_email || '').trim().toLowerCase();
+        const acc1ProfEmail = (acc1.profile?.email || '').trim().toLowerCase();
         const acc1Pass = (acc1.password || data.tb_user_pass || '').trim();
 
-        if (email.toLowerCase() === acc1Email && pass === acc1Pass) {
+        if ((inputEmail === acc1Email || (acc1ProfEmail && inputEmail === acc1ProfEmail)) && pass === acc1Pass) {
           setCurrentAccountId('account1');
           window.location.href = 'dashboard.html';
           return;
         }
 
-        // 3. Account 2 Login
+        // 3. Account 2 Login (matches account2 email OR profile email)
         const acc2 = accounts.account2 || {};
         const acc2Email = (acc2.email || '@trustbank26').trim().toLowerCase();
+        const acc2ProfEmail = (acc2.profile?.email || '').trim().toLowerCase();
         const acc2Pass = (acc2.password || '222653').trim();
 
-        if (email.toLowerCase() === acc2Email && pass === acc2Pass) {
+        if ((inputEmail === acc2Email || (acc2ProfEmail && inputEmail === acc2ProfEmail)) && pass === acc2Pass) {
           setCurrentAccountId('account2');
           window.location.href = 'dashboard.html';
           return;
