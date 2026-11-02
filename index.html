@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trust Bank - Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = { 
@@ -28,323 +29,144 @@
     };
   </script>
 
-<link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-surface font-body-md text-on-surface h-screen flex items-center justify-center antialiased">
-  <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
-    <div class="w-16 h-16 mx-auto rounded-lg bg-primary-container flex items-center justify-center mb-6">
-      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+<body class="bg-surface font-body-md text-on-surface min-h-screen flex items-center justify-center p-4 antialiased">
+  <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center relative">
+    <div class="w-16 h-16 mx-auto rounded-xl bg-primary-container flex items-center justify-center mb-6 shadow-md shadow-blue-500/20">
+      <span class="material-symbols-outlined text-white text-[32px] notranslate" translate="no">account_balance</span>
     </div>
-    <h1 class="text-2xl font-bold font-headline-lg mb-2">Welcome to Trust Bank</h1>
-    <p class="text-outline mb-8">Sign in to your account</p>
+    <h1 class="text-2xl font-bold font-headline-lg mb-2 text-on-surface">Welcome to Trust Bank</h1>
+    <p class="text-outline mb-6 text-sm">Sign in securely to your account</p>
     
     <form id="loginForm" class="flex flex-col gap-4 text-left">
-      <div id="errorMsg" class="hidden text-red-500 text-sm mb-2 text-center">Invalid credentials</div>
+      <div id="errorMsg" class="hidden text-red-600 text-sm p-3 bg-red-50 border border-red-200 rounded-lg text-center font-medium">Invalid credentials. Please try again.</div>
       
       <div>
-        <label class="block text-sm font-semibold mb-1 text-outline">Username</label>
-        <input type="text" id="emailInput" required class="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-primary">
+        <label class="block text-xs font-bold uppercase tracking-wider mb-1.5 text-outline">Username or Email</label>
+        <div class="relative">
+          <input type="text" id="emailInput" required autocomplete="username" placeholder="e.g. @trustbank25" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface font-medium transition">
+          <span class="material-symbols-outlined absolute left-3 top-3.5 text-gray-400 text-[20px] notranslate" translate="no">person</span>
+        </div>
       </div>
       
       <div>
-        <label class="block text-sm font-semibold mb-1 text-outline">Password</label>
-        <input type="password" id="passwordInput" required class="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-primary">
+        <label class="block text-xs font-bold uppercase tracking-wider mb-1.5 text-outline">Password</label>
+        <div class="relative">
+          <input type="password" id="passwordInput" required autocomplete="current-password" placeholder="••••••••" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface font-medium transition">
+          <span class="material-symbols-outlined absolute left-3 top-3.5 text-gray-400 text-[20px] notranslate" translate="no">lock</span>
+        </div>
       </div>
       
-      <button type="submit" class="w-full bg-primary hover:bg-primary-container text-white font-semibold p-3 rounded-lg transition mt-2">Sign In</button>
+      <button type="submit" id="submitBtn" class="w-full bg-primary hover:bg-primary-container text-white font-semibold py-3.5 px-4 rounded-xl shadow-md shadow-primary/25 transition-all active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
+        <span>Sign In</span>
+        <span class="material-symbols-outlined text-[18px] notranslate" translate="no">arrow_forward</span>
+      </button>
     </form>
+
+    <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between text-xs text-outline">
+      <span>Trust Bank Online</span>
+      <span class="flex items-center gap-1 text-green-600 font-medium">
+        <span class="material-symbols-outlined text-[14px] notranslate" translate="no">verified_user</span> 256-bit SSL Encrypted
+      </span>
+    </div>
   </div>
 
-  <!-- FIREBASE MODULE CONNECTION -->
+  <!-- FIREBASE & AUTH LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    import { initializeState, getAllAccounts, setCurrentAccountId } from './app.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAz1tego-FMhtuD7tGr2Cj1ZLtxdE4NTjs",
-      authDomain: "apexx-ff8bc.firebaseapp.com",
-      projectId: "apexx-ff8bc",
-      storageBucket: "apexx-ff8bc.firebasestorage.app",
-      messagingSenderId: "690467870799",
-      appId: "1:690467870799:web:be7b185cb9b7349bdff23a",
-      measurementId: "G-YR7YX1FMJ7"
-    };
+    await initializeState();
 
-    // Initialize core services
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    // Set a singular global document entry for database cross-device syncing
-    const dbRef = doc(db, "app_state", "global_data");
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
 
-    // Static baseline parameters to configure the remote database upon its first launch
-    const defaultTransactions = [
-      { id: 't1', payee: 'Apple Store', date: 'Today, 10:14 AM', amount: -899.00, type: 'card outgoing', status: 'Approved', category: 'Hardware', createdAt: Date.now() - 10000000 },
-      { id: 't2', payee: 'Payroll Direct Deposit', date: 'Yesterday', amount: 4250.00, type: 'incoming', status: 'Approved', category: 'Acme Corp', createdAt: Date.now() - 20000000 },
-      { id: 't3', payee: 'Whole Foods Market', date: 'Oct 22, 2025', amount: -84.20, type: 'card outgoing', status: 'Approved', category: 'Groceries', createdAt: Date.now() - 30000000 }
-    ];
-    const defaultProfile = {
-      name: 'Alex Morgan', dob: 'March 14, 1991', email: 'alex.morgan@domain.com', phone: '+1 (555) 234-8901',
-      address: '742 Evergreen Terrace, Suite 400, San Francisco, CA 94107', checking: '0923 8491 4820', routing: '121000358', savings: '3847 2910 9104'
-    };
-
-    // Auto-populates Firebase collection when the project runs for the first time
-    async function initFirebaseState() {
-      try {
-        const docSnap = await getDoc(dbRef);
-        if (!docSnap.exists()) {
-          await setDoc(dbRef, {
-            tb_balance: '24850.40',
-            tb_transferLimit: '5000.00',
-            tb_transactions: defaultTransactions,
-            tb_profile: defaultProfile,
-            tb_messages: [],
-            tb_user_email: 'user@com',
-            tb_user_pass: '11111',
-            tb_admin_email: 'admin@com',
-            tb_admin_pass: '00000'
-          });
-          console.log("Firebase initialized successfully with default records.");
-        }
-      } catch (e) { 
-        console.error("Firebase setup warning:", e); 
-      }
-    }
-    initFirebaseState();
-
-    // Verify submission against online Firebase document
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('emailInput').value;
-      const pass = document.getElementById('passwordInput').value;
-      const errorMsg = document.getElementById('errorMsg');
+      const email = document.getElementById('emailInput').value.trim();
+      const pass = document.getElementById('passwordInput').value.trim();
+
+      errorMsg.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px] notranslate" translate="no">sync</span><span>Verifying...</span>';
 
       try {
-        const docSnap = await getDoc(dbRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          
-          if (email === data.tb_admin_email && pass === data.tb_admin_pass) {
-            window.location.href = 'admin.html';
-          } else if (email === data.tb_user_email && pass === data.tb_user_pass) {
-            window.location.href = 'dashboard.html';
-          } else {
-            errorMsg.classList.remove('hidden');
-          }
+        const accounts = await getAllAccounts();
+        const firebaseConfig = {
+          apiKey: "AIzaSyAz1tego-FMhtuD7tGr2Cj1ZLtxdE4NTjs",
+          authDomain: "apexx-ff8bc.firebaseapp.com",
+          projectId: "apexx-ff8bc",
+          storageBucket: "apexx-ff8bc.firebasestorage.app",
+          messagingSenderId: "690467870799",
+          appId: "1:690467870799:web:be7b185cb9b7349bdff23a",
+          measurementId: "G-YR7YX1FMJ7"
+        };
+        const app = initializeApp(firebaseConfig, "authCheck_" + Date.now());
+        const db = getFirestore(app);
+        const docSnap = await getDoc(doc(db, "app_state", "global_data"));
+        const data = docSnap.exists() ? docSnap.data() : {};
+
+        const adminEmail = (data.tb_admin_email || 'admin@com').trim().toLowerCase();
+        const adminPass = (data.tb_admin_pass || '00000').trim();
+
+        // 1. Admin Login
+        if (email.toLowerCase() === adminEmail && pass === adminPass) {
+          window.location.href = 'admin.html';
+          return;
         }
+
+        // 2. Account 1 Login (matches account1 email OR legacy tb_user_email)
+        const acc1 = accounts.account1 || {};
+        const acc1Email = (acc1.email || data.tb_user_email || '').trim().toLowerCase();
+        const acc1Pass = (acc1.password || data.tb_user_pass || '').trim();
+
+        if (email.toLowerCase() === acc1Email && pass === acc1Pass) {
+          setCurrentAccountId('account1');
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        // 3. Account 2 Login
+        const acc2 = accounts.account2 || {};
+        const acc2Email = (acc2.email || '@trustbank26').trim().toLowerCase();
+        const acc2Pass = (acc2.password || '222653').trim();
+
+        if (email.toLowerCase() === acc2Email && pass === acc2Pass) {
+          setCurrentAccountId('account2');
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        // If credentials failed:
+        errorMsg.textContent = "Invalid credentials. Please verify your login details.";
+        errorMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Sign In</span><span class="material-symbols-outlined text-[18px] notranslate" translate="no">arrow_forward</span>';
+
       } catch (err) {
-        console.error("Connection failure:", err);
-        alert("Unable to process request. Check internet access or Firebase rules setup.");
+        console.error("Sign-in failure:", err);
+        errorMsg.textContent = "Unable to process request. Please check your network.";
+        errorMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Sign In</span><span class="material-symbols-outlined text-[18px] notranslate" translate="no">arrow_forward</span>';
       }
     });
   </script>
 
+  <!-- Moveable Translation Widget -->
+  <script src="translate.js"></script>
 
-<!-- Custom Translate Widget -->
-<div id="custom-translate-widget" class="notranslate" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: sans-serif;">
-  <div id="translate-menu" style="display: none; position: absolute; bottom: 60px; right: 0; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 220px; max-height: 350px; overflow-y: auto; border: 1px solid #e1e2e4;">
-    <!-- Options injected by JS -->
-  </div>
-  <button id="translate-btn" style="width: 48px; height: 48px; border-radius: 50%; background: #004ac6; color: white; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    <span class="material-symbols-outlined notranslate" style="font-size: 24px; color: white;">translate</span>
-  </button>
-</div>
-
-<div id="google_translate_element" style="display: none;"></div>
-
-<style>
-/* Hide Google Translate Banner & native widget */
-.skiptranslate iframe { display: none !important; }
-body { top: 0 !important; }
-.goog-te-combo { display: none !important; }
-/* Scrollbar for menu */
-#translate-menu::-webkit-scrollbar { width: 6px; }
-#translate-menu::-webkit-scrollbar-track { background: transparent; }
-#translate-menu::-webkit-scrollbar-thumb { background: #c3c6d7; border-radius: 4px; }
-.translate-option { padding: 12px 16px; cursor: pointer; color: #141b2b; transition: background 0.2s; font-size: 14px; display: flex; align-items: center; border-bottom: 1px solid #f1f3ff; }
-.translate-option:last-child { border-bottom: none; }
-.translate-option:hover { background: #f1f3ff; }
-.translate-option.active { background: #e9edff; color: #004ac6; font-weight: 600; }
-</style>
-
-<script type="text/javascript">
-  const languages = [
-    { code: 'af', name: 'Afrikaans' },
-    { code: 'sq', name: 'Albanian' },
-    { code: 'am', name: 'Amharic' },
-    { code: 'ar', name: 'Arabic' },
-    { code: 'hy', name: 'Armenian' },
-    { code: 'az', name: 'Azerbaijani' },
-    { code: 'eu', name: 'Basque' },
-    { code: 'be', name: 'Belarusian' },
-    { code: 'bn', name: 'Bengali' },
-    { code: 'bs', name: 'Bosnian' },
-    { code: 'bg', name: 'Bulgarian' },
-    { code: 'ca', name: 'Catalan' },
-    { code: 'ceb', name: 'Cebuano' },
-    { code: 'ny', name: 'Chichewa' },
-    { code: 'zh-CN', name: 'Chinese (Simplified)' },
-    { code: 'zh-TW', name: 'Chinese (Traditional)' },
-    { code: 'co', name: 'Corsican' },
-    { code: 'hr', name: 'Croatian' },
-    { code: 'cs', name: 'Czech' },
-    { code: 'da', name: 'Danish' },
-    { code: 'nl', name: 'Dutch' },
-    { code: 'en', name: 'English' },
-    { code: 'eo', name: 'Esperanto' },
-    { code: 'et', name: 'Estonian' },
-    { code: 'tl', name: 'Filipino' },
-    { code: 'fi', name: 'Finnish' },
-    { code: 'fr', name: 'French' },
-    { code: 'fy', name: 'Frisian' },
-    { code: 'gl', name: 'Galician' },
-    { code: 'ka', name: 'Georgian' },
-    { code: 'de', name: 'German' },
-    { code: 'el', name: 'Greek' },
-    { code: 'gu', name: 'Gujarati' },
-    { code: 'ht', name: 'Haitian Creole' },
-    { code: 'ha', name: 'Hausa' },
-    { code: 'haw', name: 'Hawaiian' },
-    { code: 'he', name: 'Hebrew' },
-    { code: 'hi', name: 'Hindi' },
-    { code: 'hmn', name: 'Hmong' },
-    { code: 'hu', name: 'Hungarian' },
-    { code: 'is', name: 'Icelandic' },
-    { code: 'ig', name: 'Igbo' },
-    { code: 'id', name: 'Indonesian' },
-    { code: 'ga', name: 'Irish' },
-    { code: 'it', name: 'Italian' },
-    { code: 'ja', name: 'Japanese' },
-    { code: 'jw', name: 'Javanese' },
-    { code: 'kn', name: 'Kannada' },
-    { code: 'kk', name: 'Kazakh' },
-    { code: 'km', name: 'Khmer' },
-    { code: 'rw', name: 'Kinyarwanda' },
-    { code: 'ko', name: 'Korean' },
-    { code: 'ku', name: 'Kurdish (Kurmanji)' },
-    { code: 'ky', name: 'Kyrgyz' },
-    { code: 'lo', name: 'Lao' },
-    { code: 'la', name: 'Latin' },
-    { code: 'lv', name: 'Latvian' },
-    { code: 'lt', name: 'Lithuanian' },
-    { code: 'lb', name: 'Luxembourgish' },
-    { code: 'mk', name: 'Macedonian' },
-    { code: 'mg', name: 'Malagasy' },
-    { code: 'ms', name: 'Malay' },
-    { code: 'ml', name: 'Malayalam' },
-    { code: 'mt', name: 'Maltese' },
-    { code: 'mi', name: 'Maori' },
-    { code: 'mr', name: 'Marathi' },
-    { code: 'mn', name: 'Mongolian' },
-    { code: 'my', name: 'Myanmar (Burmese)' },
-    { code: 'ne', name: 'Nepali' },
-    { code: 'no', name: 'Norwegian' },
-    { code: 'or', name: 'Odia (Oriya)' },
-    { code: 'ps', name: 'Pashto' },
-    { code: 'fa', name: 'Persian' },
-    { code: 'pl', name: 'Polish' },
-    { code: 'pt', name: 'Portuguese' },
-    { code: 'pa', name: 'Punjabi' },
-    { code: 'ro', name: 'Romanian' },
-    { code: 'ru', name: 'Russian' },
-    { code: 'sm', name: 'Samoan' },
-    { code: 'gd', name: 'Scots Gaelic' },
-    { code: 'sr', name: 'Serbian' },
-    { code: 'st', name: 'Sesotho' },
-    { code: 'sn', name: 'Shona' },
-    { code: 'sd', name: 'Sindhi' },
-    { code: 'si', name: 'Sinhala' },
-    { code: 'sk', name: 'Slovak' },
-    { code: 'sl', name: 'Slovenian' },
-    { code: 'so', name: 'Somali' },
-    { code: 'es', name: 'Spanish' },
-    { code: 'su', name: 'Sundanese' },
-    { code: 'sw', name: 'Swahili' },
-    { code: 'sv', name: 'Swedish' },
-    { code: 'tg', name: 'Tajik' },
-    { code: 'ta', name: 'Tamil' },
-    { code: 'tt', name: 'Tatar' },
-    { code: 'te', name: 'Telugu' },
-    { code: 'th', name: 'Thai' },
-    { code: 'tr', name: 'Turkish' },
-    { code: 'tk', name: 'Turkmen' },
-    { code: 'uk', name: 'Ukrainian' },
-    { code: 'ur', name: 'Urdu' },
-    { code: 'ug', name: 'Uyghur' },
-    { code: 'uz', name: 'Uzbek' },
-    { code: 'vi', name: 'Vietnamese' },
-    { code: 'cy', name: 'Welsh' },
-    { code: 'xh', name: 'Xhosa' },
-    { code: 'yi', name: 'Yiddish' },
-    { code: 'yo', name: 'Yoruba' },
-    { code: 'zu', name: 'Zulu' }
-  ];
-
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? match[2] : null;
-  }
-
-  function setLanguage(langCode) {
-    document.cookie = "googtrans=/en/" + langCode + "; path=/;";
-    document.cookie = "googtrans=/en/" + langCode + "; domain=." + document.domain + "; path=/;";
-    window.location.reload();
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const menu = document.getElementById('translate-menu');
-    const btn = document.getElementById('translate-btn');
-    
-    let currentLang = 'en';
-    const cookie = getCookie('googtrans');
-    if (cookie) {
-      const parts = cookie.split('/');
-      if (parts.length > 2) currentLang = parts[2];
-    }
-
-    languages.forEach(lang => {
-      const div = document.createElement('div');
-      div.className = 'translate-option' + (currentLang === lang.code ? ' active' : '');
-      div.innerHTML = lang.name;
-      div.onclick = () => {
-        menu.style.display = 'none';
-        if (currentLang !== lang.code) setLanguage(lang.code);
-      };
-      menu.appendChild(div);
-    });
-
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-    };
-
-    document.addEventListener('click', (e) => {
-      if (!menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.style.display = 'none';
-      }
-    });
-  });
-
-  function googleTranslateElementInit() {
-      new google.translate.TranslateElement({
-          pageLanguage: 'en', 
-          autoDisplay: false
-      }, 'google_translate_element');
-  }
-</script>
-<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(registration => {
-        console.log('ServiceWorker registration successful');
-      }).catch(err => {
-        console.log('ServiceWorker registration failed: ', err);
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.log('ServiceWorker registration error: ', err);
+        });
       });
-    });
-  }
-</script>
-
+    }
+  </script>
 </body>
 </html>

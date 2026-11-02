@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trust-bank-cache-v3';
+const CACHE_NAME = 'trust-bank-cache-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,7 +6,9 @@ const urlsToCache = [
   '/transfer.html',
   '/history.html',
   '/profile.html',
-  '/app.js'
+  '/app.js',
+  '/translate.js',
+  '/admin.html'
 ];
 
 self.addEventListener('install', event => {
