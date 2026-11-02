@@ -338,7 +338,7 @@ tailwind.config = {
           </button>
           <button type="button" id="clear-chat-btn" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] notranslate" translate="no">cleaning_services</span>
-            <span>Clear Chat</span>
+            <span id="clear-chat-label">Clear Active Chat</span>
           </button>
         </div>
       </div>
@@ -397,12 +397,15 @@ tailwind.config = {
       b.classList.add('text-slate-600');
     });
 
+    const clearChatLabel = document.getElementById('clear-chat-label');
+
     if (tabKey === 'account1') {
       tabAcc1.classList.add('bg-white', 'text-primary', 'shadow-sm');
       userPanels.classList.remove('hidden');
       accountBanner.classList.remove('hidden');
       adminPanel.classList.add('hidden');
       currentEditingAccount = 'account1';
+      if (clearChatLabel) clearChatLabel.textContent = 'Clear Chat (Account 1)';
       loadAccountForm('account1');
     } else if (tabKey === 'account2') {
       tabAcc2.classList.add('bg-white', 'text-emerald-700', 'shadow-sm');
@@ -410,12 +413,14 @@ tailwind.config = {
       accountBanner.classList.remove('hidden');
       adminPanel.classList.add('hidden');
       currentEditingAccount = 'account2';
+      if (clearChatLabel) clearChatLabel.textContent = 'Clear Chat (Account 2)';
       loadAccountForm('account2');
     } else if (tabKey === 'admin') {
       tabAdmin.classList.add('bg-white', 'text-red-600', 'shadow-sm');
       userPanels.classList.add('hidden');
       accountBanner.classList.add('hidden');
       adminPanel.classList.remove('hidden');
+      if (clearChatLabel) clearChatLabel.textContent = 'Clear Active Chat';
     }
   }
 
@@ -663,9 +668,14 @@ tailwind.config = {
   });
 
   document.getElementById('clear-chat-btn').addEventListener('click', async () => {
-    if (confirm("Are you sure you want to clear all support chat messages?")) {
-      await clearMessages();
-      showToast("Support chat messages cleared.");
+    const acc = cachedAccounts[currentEditingAccount] || {};
+    const accLabel = currentEditingAccount === 'account2' ? 'Account 2' : 'Account 1';
+    const accName = acc.profile?.name || (currentEditingAccount === 'account2' ? 'Jordan Taylor' : 'Alex Morgan');
+    
+    if (confirm(`Are you sure you want to clear chat messages for ${accLabel} (${accName}) only?\n\nThe other account's chat will NOT be deleted.`)) {
+      await clearMessages(currentEditingAccount);
+      showToast(`Support chat for ${accLabel} cleared.`);
+      await refreshData();
     }
   });
 

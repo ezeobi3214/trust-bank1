@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trust-bank-cache-v6';
+const CACHE_NAME = 'trust-bank-cache-v8';
 const urlsToCache = [
   '/',
   '/index.html',

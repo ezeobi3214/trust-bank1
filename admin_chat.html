@@ -3,52 +3,170 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Trust Bank Admin - Support Inbox</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-
+<style>
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+</style>
 <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-gray-50 h-screen flex flex-col font-['Manrope']">
-<header class="bg-blue-900 text-white p-4 flex items-center justify-between shadow">
-  <div class="flex items-center gap-2">
-    <a href="admin.html" class="material-symbols-outlined text-white hover:text-gray-200 notranslate">arrow_back</a>
-    <h1 class="text-xl font-bold">Admin: Support Inbox</h1>
+<body class="bg-slate-100 h-screen flex flex-col font-['Manrope'] antialiased">
+
+<!-- Fixed Top Header -->
+<header class="bg-slate-900 text-white p-3.5 sm:p-4 flex items-center justify-between shadow-md flex-shrink-0 z-20 border-b border-slate-800">
+  <div class="flex items-center gap-3 min-w-0">
+    <a href="admin.html" class="p-1 hover:bg-white/10 rounded-lg transition flex items-center justify-center flex-shrink-0" aria-label="Back to Admin Control Panel">
+      <span class="material-symbols-outlined text-white text-[22px] notranslate" translate="no">arrow_back</span>
+    </a>
+    <div class="min-w-0">
+      <h1 class="text-base sm:text-lg font-bold leading-tight truncate">Admin: Support Inbox</h1>
+      <p class="text-[11px] text-slate-400 truncate mt-0.5">Two-way isolated client messaging</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 flex-shrink-0">
+    <button type="button" id="clear-convo-btn" class="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30 text-xs font-bold rounded-lg transition flex items-center gap-1">
+      <span class="material-symbols-outlined text-[16px] notranslate" translate="no">delete</span>
+      <span class="hidden xs:inline">Clear Chat</span>
+    </button>
   </div>
 </header>
-<main class="flex-1 overflow-y-auto p-4 flex flex-col gap-4" id="chat-box">
-  <!-- Messages will appear here -->
+
+<!-- Account Conversation Switcher -->
+<div class="bg-slate-800 p-2 sm:px-4 flex items-center justify-between gap-2 shadow-inner flex-shrink-0 z-10 border-b border-slate-700">
+  <div class="flex items-center gap-2 w-full max-w-xl mx-auto">
+    <button id="btn-chat-acc1" type="button" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-blue-600 text-white shadow-sm">
+      <span class="w-2.5 h-2.5 rounded-full bg-white flex-shrink-0"></span>
+      <span class="truncate" id="tab-acc1-title">Account 1 (Alex)</span>
+      <span id="badge-count-acc1" class="hidden px-1.5 py-0.2 bg-white/20 text-white text-[10px] rounded-full">0</span>
+    </button>
+    <button id="btn-chat-acc2" type="button" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-300">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
+      <span class="truncate" id="tab-acc2-title">Account 2 (Jordan)</span>
+      <span id="badge-count-acc2" class="hidden px-1.5 py-0.2 bg-white/20 text-white text-[10px] rounded-full">0</span>
+    </button>
+  </div>
+</div>
+
+<!-- Active Customer Status Banner -->
+<div class="bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0">
+  <div class="flex items-center gap-2.5 min-w-0">
+    <div id="active-user-avatar" class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs flex-shrink-0 overflow-hidden">
+      <span class="material-symbols-outlined text-[18px] notranslate" translate="no">person</span>
+    </div>
+    <div class="min-w-0">
+      <div class="flex items-center gap-1.5">
+        <span class="font-bold text-xs sm:text-sm text-slate-900 truncate" id="active-user-name">Alex Morgan</span>
+        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800" id="active-user-badge">Account 1</span>
+      </div>
+      <p class="text-[11px] text-slate-500 font-mono truncate" id="active-user-email">@trustbank25</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold flex-shrink-0">
+    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+    <span>Active Channel</span>
+  </div>
+</div>
+
+<!-- Chat Messages Scroll Area -->
+<main class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-3 min-w-0" id="chat-box">
+  <div class="text-center text-slate-400 my-8 text-sm italic">Loading conversation...</div>
 </main>
-<footer class="bg-white p-4 border-t flex items-center gap-2">
-  <input type="text" id="chat-input" class="flex-1 bg-gray-100 border-none rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a reply...">
-  <button id="send-btn" class="bg-blue-800 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-900">
-    <span class="material-symbols-outlined notranslate" translate="no">send</span>
+
+<!-- Bottom Reply Form -->
+<footer class="bg-white p-3 sm:p-4 border-t border-slate-200 flex items-center gap-2 shadow-sm flex-shrink-0 z-20">
+  <input type="text" id="chat-input" class="flex-1 bg-slate-100 border border-slate-200 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-slate-800 focus:bg-white transition" placeholder="Type a reply to customer...">
+  <button id="send-btn" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-white rounded-full w-10 h-10 flex items-center justify-center shadow transition flex-shrink-0" aria-label="Send reply">
+    <span class="material-symbols-outlined notranslate text-[20px]" translate="no">send</span>
   </button>
 </footer>
 
 <script type="module">
-  import { addMessage, getMessages, listenToDatabaseChanges } from './app.js';
+  import { addMessage, getMessages, clearMessages, getAllAccounts, listenToDatabaseChanges } from './app.js';
 
-  async function renderMessages(messages) {
-    const box = document.getElementById('chat-box');
-    const msgs = messages || await getMessages();
-    box.innerHTML = '';
-    
-    if (msgs.length === 0) {
-      box.innerHTML = '<div class="text-center text-gray-500 my-4 text-sm">No messages yet.</div>';
+  let selectedAccountId = 'account1';
+  let cachedAccounts = {};
+
+  const box = document.getElementById('chat-box');
+  const input = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('send-btn');
+  const tabAcc1 = document.getElementById('btn-chat-acc1');
+  const tabAcc2 = document.getElementById('btn-chat-acc2');
+  const clearBtn = document.getElementById('clear-convo-btn');
+
+  const activeUserName = document.getElementById('active-user-name');
+  const activeUserEmail = document.getElementById('active-user-email');
+  const activeUserBadge = document.getElementById('active-user-badge');
+  const activeUserAvatar = document.getElementById('active-user-avatar');
+
+  function updateTabButtons() {
+    if (selectedAccountId === 'account1') {
+      tabAcc1.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-blue-600 text-white shadow-sm';
+      tabAcc2.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-300';
+    } else {
+      tabAcc1.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-300';
+      tabAcc2.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-sm';
+    }
+  }
+
+  function updateCustomerInfo() {
+    const acc = cachedAccounts[selectedAccountId] || {};
+    const isAcc1 = selectedAccountId === 'account1';
+    const name = acc.profile?.name || (isAcc1 ? 'Alex Morgan' : 'Jordan Taylor');
+    const email = acc.email || (isAcc1 ? '@trustbank25' : '@trustbank26');
+
+    activeUserName.textContent = name;
+    activeUserEmail.textContent = email;
+    activeUserBadge.textContent = isAcc1 ? 'Account 1' : 'Account 2';
+    activeUserBadge.className = isAcc1
+      ? 'text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800'
+      : 'text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800';
+
+    if (acc.profile?.avatar) {
+      activeUserAvatar.innerHTML = `<img src="${acc.profile.avatar}" class="w-full h-full object-cover rounded-full">`;
+    } else {
+      activeUserAvatar.innerHTML = `<span class="material-symbols-outlined text-[18px] notranslate" translate="no">person</span>`;
     }
 
-    msgs.forEach(m => {
+    input.placeholder = `Type a reply to ${name.split(' ')[0]}...`;
+  }
+
+  function renderMessages(messages) {
+    box.innerHTML = '';
+    
+    if (!messages || messages.length === 0) {
+      box.innerHTML = `
+        <div class="flex flex-col items-center justify-center my-auto py-12 text-center">
+          <div class="w-12 h-12 rounded-xl bg-slate-200 text-slate-500 flex items-center justify-center mb-2">
+            <span class="material-symbols-outlined text-[28px] notranslate" translate="no">chat_bubble_outline</span>
+          </div>
+          <p class="text-sm font-semibold text-slate-600">No messages yet with ${activeUserName.textContent}.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Send a message below to begin this customer support thread.</p>
+        </div>
+      `;
+      return;
+    }
+
+    messages.forEach(m => {
       const isAdmin = m.sender === 'Admin';
-      const alignClass = isAdmin ? 'self-end bg-blue-800 text-white' : 'self-start bg-gray-200 text-gray-800';
-      const radiusClass = isAdmin ? 'rounded-tl-xl rounded-bl-xl rounded-tr-xl' : 'rounded-tr-xl rounded-br-xl rounded-tl-xl';
+      const alignClass = isAdmin ? 'self-end bg-slate-900 text-white' : 'self-start bg-white text-slate-800 border border-slate-200';
+      const radiusClass = isAdmin ? 'rounded-2xl rounded-tr-sm' : 'rounded-2xl rounded-tl-sm';
       
       const el = document.createElement('div');
-      el.className = `max-w-[75%] px-4 py-2 ${radiusClass} ${alignClass}`;
+      el.className = `max-w-[85%] sm:max-w-[70%] px-4 py-2.5 ${radiusClass} ${alignClass} shadow-sm break-words`;
       el.innerHTML = `
-        <div class="text-sm font-semibold mb-1 opacity-70">${m.sender}</div>
-        <p>${m.text}</p>
-        <div class="text-xs text-right mt-1 opacity-70">${m.time}</div>
+        <div class="text-[11px] font-bold mb-1 ${isAdmin ? 'text-slate-300' : 'text-blue-700'}">${m.sender}</div>
+        <p class="text-sm leading-relaxed whitespace-pre-wrap">${m.text}</p>
+        <div class="text-[10px] text-right mt-1.5 ${isAdmin ? 'text-slate-400' : 'text-slate-400'}">${m.time}</div>
       `;
       box.appendChild(el);
     });
@@ -56,24 +174,80 @@
     box.scrollTop = box.scrollHeight;
   }
 
-  document.getElementById('send-btn').addEventListener('click', async () => {
-    const input = document.getElementById('chat-input');
+  async function selectAccount(accKey) {
+    selectedAccountId = accKey;
+    updateTabButtons();
+    updateCustomerInfo();
+    const msgs = await getMessages(accKey);
+    renderMessages(msgs);
+  }
+
+  tabAcc1.addEventListener('click', () => selectAccount('account1'));
+  tabAcc2.addEventListener('click', () => selectAccount('account2'));
+
+  async function pushAdminReply() {
     const text = input.value.trim();
-    if(text) {
-      await addMessage({ sender: 'Admin', text, time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) });
+    if (text) {
+      const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const newMsgObj = {
+        sender: 'Admin',
+        text: text,
+        time: timestamp
+      };
+
       input.value = '';
-      await renderMessages();
+      await addMessage(newMsgObj, selectedAccountId);
+      const msgs = await getMessages(selectedAccountId);
+      renderMessages(msgs);
+    }
+  }
+
+  sendBtn.addEventListener('click', pushAdminReply);
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') pushAdminReply();
+  });
+
+  clearBtn.addEventListener('click', async () => {
+    const name = activeUserName.textContent;
+    const isAcc1 = selectedAccountId === 'account1';
+    const accLabel = isAcc1 ? 'Account 1' : 'Account 2';
+    if (confirm(`Clear conversation with ${name} (${accLabel}) only?\n\nThe other account's chat will NOT be deleted.`)) {
+      await clearMessages(selectedAccountId);
+      renderMessages([]);
     }
   });
 
-  document.getElementById('chat-input').addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') document.getElementById('send-btn').click();
+  async function loadInitial() {
+    cachedAccounts = await getAllAccounts();
+    const acc1 = cachedAccounts.account1 || {};
+    const acc2 = cachedAccounts.account2 || {};
+
+    document.getElementById('tab-acc1-title').textContent = `Account 1 (${(acc1.profile?.name || 'Alex').split(' ')[0]})`;
+    document.getElementById('tab-acc2-title').textContent = `Account 2 (${(acc2.profile?.name || 'Jordan').split(' ')[0]})`;
+
+    updateCustomerInfo();
+    const msgs = await getMessages(selectedAccountId);
+    renderMessages(msgs);
+  }
+
+  // Real-time listener
+  listenToDatabaseChanges((dbData) => {
+    if (!dbData) return;
+    if (dbData.accounts) {
+      cachedAccounts = dbData.accounts;
+      const accMsgs = dbData.accounts[selectedAccountId]?.messages 
+        || (selectedAccountId === 'account1' ? dbData.tb_messages : []) 
+        || [];
+      renderMessages(accMsgs);
+    }
   });
 
-  listenToDatabaseChanges(data => renderMessages(data?.tb_messages || []));
-  renderMessages();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadInitial);
+  } else {
+    loadInitial();
+  }
 </script>
-
 
 <!-- Moveable Translation Widget -->
 <script src="translate.js"></script>

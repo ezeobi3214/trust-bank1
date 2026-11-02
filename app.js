@@ -63,7 +63,8 @@ export const defaultState = {
       balance: 24850.40,
       transferLimit: 5000.00,
       profile: defaultProfile1,
-      transactions: defaultTransactions1
+      transactions: defaultTransactions1,
+      messages: []
     },
     account2: {
       id: 'account2',
@@ -72,7 +73,8 @@ export const defaultState = {
       balance: 18450.00,
       transferLimit: 5000.00,
       profile: defaultProfile2,
-      transactions: defaultTransactions2
+      transactions: defaultTransactions2,
+      messages: []
     }
   },
   tb_admin_email: 'admin@com',
@@ -124,7 +126,8 @@ function normalizeAccount(raw, defaultAcc) {
       ...defaultAcc.profile,
       ...(raw.profile || {})
     },
-    transactions: Array.isArray(raw.transactions) ? raw.transactions : (defaultAcc.transactions || [])
+    transactions: Array.isArray(raw.transactions) ? raw.transactions : (defaultAcc.transactions || []),
+    messages: Array.isArray(raw.messages) ? raw.messages : (defaultAcc.messages || [])
   };
 }
 
@@ -156,9 +159,14 @@ export async function initializeState() {
         balance: parseFloat(data.tb_balance) || 24850.40,
         transferLimit: parseFloat(data.tb_transferLimit) || 5000.00,
         profile: data.tb_profile ? { ...defaultProfile1, ...data.tb_profile } : defaultProfile1,
-        transactions: data.tb_transactions || defaultTransactions1
+        transactions: data.tb_transactions || defaultTransactions1,
+        messages: Array.isArray(data.tb_messages) ? data.tb_messages : []
       };
     } else {
+      if (!Array.isArray(accounts.account1.messages)) {
+        accounts.account1.messages = Array.isArray(data.tb_messages) ? data.tb_messages : [];
+        needsUpdate = true;
+      }
       accounts.account1 = normalizeAccount(accounts.account1, defaultState.accounts.account1);
     }
 
@@ -171,9 +179,14 @@ export async function initializeState() {
         balance: 18450.00,
         transferLimit: 5000.00,
         profile: defaultProfile2,
-        transactions: defaultTransactions2
+        transactions: defaultTransactions2,
+        messages: []
       };
     } else {
+      if (!Array.isArray(accounts.account2.messages)) {
+        accounts.account2.messages = [];
+        needsUpdate = true;
+      }
       accounts.account2 = normalizeAccount(accounts.account2, defaultState.accounts.account2);
     }
 
@@ -544,34 +557,89 @@ export async function updateAdminCredentials({ email, password }) {
   }
 }
 
-// MESSAGES & SUPPORT CHAT
-export async function getMessages() {
+// MESSAGES & SUPPORT CHAT (Isolated per account)
+export async function getMessages(accountId = getCurrentAccountId()) {
   try {
     await initialization;
     const docSnap = await getDoc(dbRef);
-    return docSnap.exists() ? (docSnap.data().tb_messages || []) : [];
+    if (!docSnap.exists()) return [];
+    const data = docSnap.data();
+    const accounts = data.accounts || {};
+    const acc = accounts[accountId];
+    if (acc && Array.isArray(acc.messages)) {
+      return acc.messages;
+    }
+    // Backward compatibility for account1
+    if (accountId === 'account1' && Array.isArray(data.tb_messages)) {
+      return data.tb_messages;
+    }
+    return [];
   } catch (error) {
     console.error("Read failure (messages):", error);
     return [];
   }
 }
 
-export async function addMessage(msg) {
+export async function addMessage(msg, accountId = getCurrentAccountId()) {
   try {
     await initialization;
     const docSnap = await getDoc(dbRef);
-    const currentMsgs = docSnap.exists() ? (docSnap.data().tb_messages || []) : [];
-    await setDoc(dbRef, { tb_messages: [...currentMsgs, msg] }, { merge: true });
+    const data = docSnap.exists() ? docSnap.data() : defaultState;
+    const accounts = data.accounts || defaultState.accounts;
+    const targetAcc = accounts[accountId] || defaultState.accounts[accountId] || {};
+    const currentMsgs = Array.isArray(targetAcc.messages)
+      ? targetAcc.messages
+      : (accountId === 'account1' && Array.isArray(data.tb_messages) ? data.tb_messages : []);
+
+    const updatedMsgs = [...currentMsgs, { ...msg, accountId }];
+
+    const updatedAccount = {
+      ...targetAcc,
+      messages: updatedMsgs
+    };
+
+    const patches = {
+      accounts: {
+        ...accounts,
+        [accountId]: updatedAccount
+      }
+    };
+
+    // Keep legacy tb_messages in sync if account1
+    if (accountId === 'account1') {
+      patches.tb_messages = updatedMsgs;
+    }
+
+    await setDoc(dbRef, patches, { merge: true });
+    console.log(`Message added to ${accountId}. Total: ${updatedMsgs.length}`);
   } catch (error) {
     console.error("Write failure (message):", error);
   }
 }
 
-export async function clearMessages() {
+export async function clearMessages(accountId = null) {
   try {
     await initialization;
-    await setDoc(dbRef, { tb_messages: [] }, { merge: true });
-    console.log("Messages cleared.");
+    const docSnap = await getDoc(dbRef);
+    const data = docSnap.exists() ? docSnap.data() : {};
+    const accounts = { ...(data.accounts || {}) };
+
+    if (accountId) {
+      if (accounts[accountId]) {
+        accounts[accountId] = { ...accounts[accountId], messages: [] };
+      }
+      const patches = { accounts };
+      if (accountId === 'account1') patches.tb_messages = [];
+      await setDoc(dbRef, patches, { merge: true });
+    } else {
+      for (const k of Object.keys(accounts)) {
+        if (accounts[k]) {
+          accounts[k] = { ...accounts[k], messages: [] };
+        }
+      }
+      await setDoc(dbRef, { accounts, tb_messages: [] }, { merge: true });
+    }
+    console.log(`Messages cleared for: ${accountId || 'all accounts'}`);
   } catch (error) {
     console.error("Failed to clear messages:", error);
   }
