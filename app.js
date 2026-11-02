@@ -266,6 +266,8 @@ export async function updateAccount(accountId, updates) {
       if (updatedAccount.profile) patches.tb_profile = updatedAccount.profile;
       if (updatedAccount.email) patches.tb_user_email = updatedAccount.email;
       if (updatedAccount.password) patches.tb_user_pass = updatedAccount.password;
+      if (updatedAccount.transactions !== undefined) patches.tb_transactions = updatedAccount.transactions;
+      if (updatedAccount.messages !== undefined) patches.tb_messages = updatedAccount.messages;
     }
 
     await setDoc(dbRef, patches, { merge: true });
@@ -471,20 +473,47 @@ export async function getAllPendingTransactions() {
   }
 }
 
-// CLEAR ALL TRANSACTIONS (Optional accountId, or both)
-export async function clearTransactions(accountId = null) {
+// CLEAR TRANSACTIONS (Strictly isolated by accountId)
+export async function clearTransactions(accountId = getCurrentAccountId()) {
   try {
     await initialization;
-    if (accountId) {
-      await updateAccount(accountId, { transactions: [] });
-    } else {
-      await updateAccount('account1', { transactions: [] });
-      await updateAccount('account2', { transactions: [] });
-      await setDoc(dbRef, { tb_transactions: [] }, { merge: true });
+    const docSnap = await getDoc(dbRef);
+    const data = docSnap.exists() ? docSnap.data() : defaultState;
+    const currentAccounts = data.accounts || defaultState.accounts;
+
+    if (accountId === 'all') {
+      const updatedAccounts = {
+        ...currentAccounts,
+        account1: { ...(currentAccounts.account1 || {}), transactions: [] },
+        account2: { ...(currentAccounts.account2 || {}), transactions: [] }
+      };
+      await setDoc(dbRef, { accounts: updatedAccounts, tb_transactions: [] }, { merge: true });
+      console.log("All transactions cleared across both accounts.");
+      return;
     }
-    console.log("Transactions cleared.");
+
+    const targetId = (accountId === 'account2') ? 'account2' : 'account1';
+    const targetAcc = currentAccounts[targetId] || defaultState.accounts[targetId] || {};
+    
+    const updatedAccount = {
+      ...targetAcc,
+      transactions: []
+    };
+
+    const newAccounts = {
+      ...currentAccounts,
+      [targetId]: updatedAccount
+    };
+
+    const patches = { accounts: newAccounts };
+    if (targetId === 'account1') {
+      patches.tb_transactions = [];
+    }
+
+    await setDoc(dbRef, patches, { merge: true });
+    console.log(`Transactions cleared exclusively for ${targetId}.`);
   } catch (error) {
-    console.error("Failed to clear transactions:", error);
+    console.error(`Failed to clear transactions for ${accountId}:`, error);
   }
 }
 
@@ -617,31 +646,47 @@ export async function addMessage(msg, accountId = getCurrentAccountId()) {
   }
 }
 
-export async function clearMessages(accountId = null) {
+// CLEAR MESSAGES (Strictly isolated by accountId)
+export async function clearMessages(accountId = getCurrentAccountId()) {
   try {
     await initialization;
     const docSnap = await getDoc(dbRef);
-    const data = docSnap.exists() ? docSnap.data() : {};
-    const accounts = { ...(data.accounts || {}) };
+    const data = docSnap.exists() ? docSnap.data() : defaultState;
+    const currentAccounts = data.accounts || defaultState.accounts;
 
-    if (accountId) {
-      if (accounts[accountId]) {
-        accounts[accountId] = { ...accounts[accountId], messages: [] };
-      }
-      const patches = { accounts };
-      if (accountId === 'account1') patches.tb_messages = [];
-      await setDoc(dbRef, patches, { merge: true });
-    } else {
-      for (const k of Object.keys(accounts)) {
-        if (accounts[k]) {
-          accounts[k] = { ...accounts[k], messages: [] };
-        }
-      }
-      await setDoc(dbRef, { accounts, tb_messages: [] }, { merge: true });
+    if (accountId === 'all') {
+      const updatedAccounts = {
+        ...currentAccounts,
+        account1: { ...(currentAccounts.account1 || {}), messages: [] },
+        account2: { ...(currentAccounts.account2 || {}), messages: [] }
+      };
+      await setDoc(dbRef, { accounts: updatedAccounts, tb_messages: [] }, { merge: true });
+      console.log("All messages cleared across both accounts.");
+      return;
     }
-    console.log(`Messages cleared for: ${accountId || 'all accounts'}`);
+
+    const targetId = (accountId === 'account2') ? 'account2' : 'account1';
+    const targetAcc = currentAccounts[targetId] || defaultState.accounts[targetId] || {};
+    
+    const updatedAccount = {
+      ...targetAcc,
+      messages: []
+    };
+
+    const newAccounts = {
+      ...currentAccounts,
+      [targetId]: updatedAccount
+    };
+
+    const patches = { accounts: newAccounts };
+    if (targetId === 'account1') {
+      patches.tb_messages = [];
+    }
+
+    await setDoc(dbRef, patches, { merge: true });
+    console.log(`Messages cleared exclusively for ${targetId}.`);
   } catch (error) {
-    console.error("Failed to clear messages:", error);
+    console.error(`Failed to clear messages for ${accountId}:`, error);
   }
 }
 

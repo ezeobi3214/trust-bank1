@@ -334,7 +334,7 @@ tailwind.config = {
         <div class="flex items-center gap-2 flex-wrap">
           <button type="button" id="clear-tx-btn" class="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] notranslate" translate="no">delete_sweep</span>
-            <span>Clear All Transactions</span>
+            <span id="clear-tx-label">Clear Transactions (Account 1)</span>
           </button>
           <button type="button" id="clear-chat-btn" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] notranslate" translate="no">cleaning_services</span>
@@ -397,6 +397,7 @@ tailwind.config = {
       b.classList.add('text-slate-600');
     });
 
+    const clearTxLabel = document.getElementById('clear-tx-label');
     const clearChatLabel = document.getElementById('clear-chat-label');
 
     if (tabKey === 'account1') {
@@ -405,6 +406,7 @@ tailwind.config = {
       accountBanner.classList.remove('hidden');
       adminPanel.classList.add('hidden');
       currentEditingAccount = 'account1';
+      if (clearTxLabel) clearTxLabel.textContent = 'Clear Transactions (Account 1)';
       if (clearChatLabel) clearChatLabel.textContent = 'Clear Chat (Account 1)';
       loadAccountForm('account1');
     } else if (tabKey === 'account2') {
@@ -413,6 +415,7 @@ tailwind.config = {
       accountBanner.classList.remove('hidden');
       adminPanel.classList.add('hidden');
       currentEditingAccount = 'account2';
+      if (clearTxLabel) clearTxLabel.textContent = 'Clear Transactions (Account 2)';
       if (clearChatLabel) clearChatLabel.textContent = 'Clear Chat (Account 2)';
       loadAccountForm('account2');
     } else if (tabKey === 'admin') {
@@ -420,6 +423,7 @@ tailwind.config = {
       userPanels.classList.add('hidden');
       accountBanner.classList.add('hidden');
       adminPanel.classList.remove('hidden');
+      if (clearTxLabel) clearTxLabel.textContent = 'Clear Transactions';
       if (clearChatLabel) clearChatLabel.textContent = 'Clear Active Chat';
     }
   }
@@ -658,18 +662,22 @@ tailwind.config = {
     }
   };
 
-  // CLEAR BUTTONS
+  // CLEAR BUTTONS (Strictly isolated per account)
   document.getElementById('clear-tx-btn').addEventListener('click', async () => {
-    if (confirm("Are you sure you want to delete all transactions across both accounts? This cannot be undone.")) {
-      await clearTransactions();
-      showToast("All transactions cleared.");
+    const accLabel = currentEditingAccount === 'account2' ? 'Account 2' : 'Account 1';
+    const acc = cachedAccounts[currentEditingAccount] || {};
+    const accName = acc.profile?.name || (currentEditingAccount === 'account2' ? 'Jordan Taylor' : 'Alex Morgan');
+    
+    if (confirm(`Are you sure you want to delete all transactions for ${accLabel} (${accName}) only?\n\nThe other account's transactions will NOT be affected.`)) {
+      await clearTransactions(currentEditingAccount);
+      showToast(`Transactions for ${accLabel} cleared.`);
       await refreshData();
     }
   });
 
   document.getElementById('clear-chat-btn').addEventListener('click', async () => {
-    const acc = cachedAccounts[currentEditingAccount] || {};
     const accLabel = currentEditingAccount === 'account2' ? 'Account 2' : 'Account 1';
+    const acc = cachedAccounts[currentEditingAccount] || {};
     const accName = acc.profile?.name || (currentEditingAccount === 'account2' ? 'Jordan Taylor' : 'Alex Morgan');
     
     if (confirm(`Are you sure you want to clear chat messages for ${accLabel} (${accName}) only?\n\nThe other account's chat will NOT be deleted.`)) {
@@ -686,6 +694,12 @@ tailwind.config = {
 
     document.getElementById('tab-acc1-label').textContent = `Account 1 (${(acc1.profile?.name || 'Alex').split(' ')[0]})`;
     document.getElementById('tab-acc2-label').textContent = `Account 2 (${(acc2.profile?.name || 'Jordan').split(' ')[0]})`;
+
+    const clearTxLabel = document.getElementById('clear-tx-label');
+    const clearChatLabel = document.getElementById('clear-chat-label');
+    const accLabel = currentEditingAccount === 'account2' ? 'Account 2' : 'Account 1';
+    if (clearTxLabel) clearTxLabel.textContent = `Clear Transactions (${accLabel})`;
+    if (clearChatLabel) clearChatLabel.textContent = `Clear Chat (${accLabel})`;
 
     const passwords = await getPasswords();
     if (passwords.adminPass) {

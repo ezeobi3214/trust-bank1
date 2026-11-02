@@ -70,7 +70,7 @@
 </main>
 
 <script type="module">
-  import { formatCurrency, getTransactions, getProfile, getCurrentAccountId } from './app.js';
+  import { formatCurrency, getTransactions, getProfile, getCurrentAccountId, listenToDatabaseChanges } from './app.js';
 
   document.addEventListener('DOMContentLoaded', async () => {
     const accId = getCurrentAccountId();
@@ -164,7 +164,7 @@
     }
     
     await loadTransactions();
-    setInterval(loadTransactions, 5000);
+    listenToDatabaseChanges(() => loadTransactions());
   });
 </script>
 

@@ -36,7 +36,7 @@
   <div class="flex items-center gap-2 flex-shrink-0">
     <button type="button" id="clear-convo-btn" class="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30 text-xs font-bold rounded-lg transition flex items-center gap-1">
       <span class="material-symbols-outlined text-[16px] notranslate" translate="no">delete</span>
-      <span class="hidden xs:inline">Clear Chat</span>
+      <span id="clear-convo-label" class="hidden xs:inline">Clear Chat (Account 1)</span>
     </button>
   </div>
 </header>
@@ -178,6 +178,10 @@
     selectedAccountId = accKey;
     updateTabButtons();
     updateCustomerInfo();
+    const clearLabel = document.getElementById('clear-convo-label');
+    if (clearLabel) {
+      clearLabel.textContent = `Clear Chat (${accKey === 'account2' ? 'Account 2' : 'Account 1'})`;
+    }
     const msgs = await getMessages(accKey);
     renderMessages(msgs);
   }
@@ -226,6 +230,10 @@
     document.getElementById('tab-acc2-title').textContent = `Account 2 (${(acc2.profile?.name || 'Jordan').split(' ')[0]})`;
 
     updateCustomerInfo();
+    const clearLabel = document.getElementById('clear-convo-label');
+    if (clearLabel) {
+      clearLabel.textContent = `Clear Chat (${selectedAccountId === 'account2' ? 'Account 2' : 'Account 1'})`;
+    }
     const msgs = await getMessages(selectedAccountId);
     renderMessages(msgs);
   }
@@ -235,9 +243,10 @@
     if (!dbData) return;
     if (dbData.accounts) {
       cachedAccounts = dbData.accounts;
-      const accMsgs = dbData.accounts[selectedAccountId]?.messages 
-        || (selectedAccountId === 'account1' ? dbData.tb_messages : []) 
-        || [];
+      const targetAcc = dbData.accounts[selectedAccountId];
+      const accMsgs = Array.isArray(targetAcc?.messages)
+        ? targetAcc.messages
+        : (selectedAccountId === 'account1' && Array.isArray(dbData.tb_messages) ? dbData.tb_messages : []);
       renderMessages(accMsgs);
     }
   });

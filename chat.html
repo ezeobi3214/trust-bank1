@@ -119,9 +119,10 @@
   // Real-time synchronization strictly for this account
   listenToDatabaseChanges((dbData) => {
     if (!dbData) return;
-    const accountMsgs = dbData.accounts?.[currentAccountId]?.messages 
-      || (currentAccountId === 'account1' ? dbData.tb_messages : []) 
-      || [];
+    const currentAcc = dbData.accounts?.[currentAccountId];
+    const accountMsgs = Array.isArray(currentAcc?.messages)
+      ? currentAcc.messages
+      : (currentAccountId === 'account1' && Array.isArray(dbData.tb_messages) ? dbData.tb_messages : []);
     renderMessages(accountMsgs);
   });
 
