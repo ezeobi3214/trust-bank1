@@ -586,6 +586,43 @@ export async function updateAdminCredentials({ email, password }) {
   }
 }
 
+// IMAGE COMPRESSION HELPER (Canvas-based for performance & Firestore document size safety)
+export function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return reject(new Error('Selected file is not an image'));
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read image file'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Failed to load image element'));
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, width);
+        canvas.height = Math.max(1, height);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // MESSAGES & SUPPORT CHAT (Isolated per account)
 export async function getMessages(accountId = getCurrentAccountId()) {
   try {
@@ -620,29 +657,104 @@ export async function addMessage(msg, accountId = getCurrentAccountId()) {
       ? targetAcc.messages
       : (accountId === 'account1' && Array.isArray(data.tb_messages) ? data.tb_messages : []);
 
-    const updatedMsgs = [...currentMsgs, { ...msg, accountId }];
-
-    const updatedAccount = {
-      ...targetAcc,
-      messages: updatedMsgs
+    const messageId = msg.id || `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const fullMsg = {
+      id: messageId,
+      sender: msg.sender || 'User',
+      text: (msg.text || '').trim(),
+      image: msg.image || null,
+      time: msg.time || new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      timestamp: msg.timestamp || Date.now(),
+      seen: Boolean(msg.seen),
+      accountId: accountId
     };
 
+    let updatedMsgs = [...currentMsgs, fullMsg];
+
+    // Cap chat history to latest 100 messages to prevent Firestore 1MB document limit exhaustion
+    if (updatedMsgs.length > 100) {
+      updatedMsgs = updatedMsgs.slice(-100);
+    }
+
+    // Write ONLY the targeted account's messages using targeted merge
+    // to avoid uploading the entire database (all accounts, transactions, avatars, credentials) on every message
     const patches = {
       accounts: {
-        ...accounts,
-        [accountId]: updatedAccount
+        [accountId]: {
+          messages: updatedMsgs
+        }
       }
     };
 
-    // Keep legacy tb_messages in sync if account1
+    // If account1, sync legacy tb_messages without duplicating heavy image data
     if (accountId === 'account1') {
-      patches.tb_messages = updatedMsgs;
+      patches.tb_messages = updatedMsgs.map(m => m.image ? { ...m, image: '[Image Attached]' } : m);
     }
 
     await setDoc(dbRef, patches, { merge: true });
     console.log(`Message added to ${accountId}. Total: ${updatedMsgs.length}`);
+    return fullMsg;
   } catch (error) {
     console.error("Write failure (message):", error);
+    throw error;
+  }
+}
+
+let isMarkingSeen = false;
+export async function markMessagesAsSeen(accountId = getCurrentAccountId(), readerRole = 'customer') {
+  if (isMarkingSeen) return false;
+  try {
+    await initialization;
+    const docSnap = await getDoc(dbRef);
+    if (!docSnap.exists()) return false;
+    const data = docSnap.data();
+    const accounts = data.accounts || defaultState.accounts;
+    const targetAcc = accounts[accountId] || defaultState.accounts[accountId] || {};
+    const currentMsgs = Array.isArray(targetAcc.messages)
+      ? targetAcc.messages
+      : (accountId === 'account1' && Array.isArray(data.tb_messages) ? data.tb_messages : []);
+
+    let hasUnseen = false;
+    const updatedMsgs = currentMsgs.map(m => {
+      // If customer is reading, mark Admin messages as seen
+      // If admin is reading, mark customer messages (sender !== 'Admin') as seen
+      const isTarget = readerRole === 'admin' ? (m.sender !== 'Admin') : (m.sender === 'Admin');
+      if (isTarget && !m.seen) {
+        hasUnseen = true;
+        return {
+          ...m,
+          seen: true,
+          seenAt: Date.now()
+        };
+      }
+      return m;
+    });
+
+    if (!hasUnseen) {
+      return false; // Nothing changed, skip writing to avoid unnecessary Firestore operations
+    }
+
+    isMarkingSeen = true;
+    const patches = {
+      accounts: {
+        [accountId]: {
+          messages: updatedMsgs
+        }
+      }
+    };
+
+    if (accountId === 'account1') {
+      patches.tb_messages = updatedMsgs.map(m => m.image ? { ...m, image: '[Image Attached]' } : m);
+    }
+
+    await setDoc(dbRef, patches, { merge: true });
+    console.log(`Marked messages as seen in ${accountId} by ${readerRole}`);
+    return true;
+  } catch (error) {
+    console.error("Failed to mark messages as seen:", error);
+    return false;
+  } finally {
+    isMarkingSeen = false;
   }
 }
 
@@ -650,35 +762,27 @@ export async function addMessage(msg, accountId = getCurrentAccountId()) {
 export async function clearMessages(accountId = getCurrentAccountId()) {
   try {
     await initialization;
-    const docSnap = await getDoc(dbRef);
-    const data = docSnap.exists() ? docSnap.data() : defaultState;
-    const currentAccounts = data.accounts || defaultState.accounts;
-
     if (accountId === 'all') {
-      const updatedAccounts = {
-        ...currentAccounts,
-        account1: { ...(currentAccounts.account1 || {}), messages: [] },
-        account2: { ...(currentAccounts.account2 || {}), messages: [] }
+      const patches = {
+        accounts: {
+          account1: { messages: [] },
+          account2: { messages: [] }
+        },
+        tb_messages: []
       };
-      await setDoc(dbRef, { accounts: updatedAccounts, tb_messages: [] }, { merge: true });
+      await setDoc(dbRef, patches, { merge: true });
       console.log("All messages cleared across both accounts.");
       return;
     }
 
     const targetId = (accountId === 'account2') ? 'account2' : 'account1';
-    const targetAcc = currentAccounts[targetId] || defaultState.accounts[targetId] || {};
-    
-    const updatedAccount = {
-      ...targetAcc,
-      messages: []
+    const patches = {
+      accounts: {
+        [targetId]: {
+          messages: []
+        }
+      }
     };
-
-    const newAccounts = {
-      ...currentAccounts,
-      [targetId]: updatedAccount
-    };
-
-    const patches = { accounts: newAccounts };
     if (targetId === 'account1') {
       patches.tb_messages = [];
     }
@@ -690,13 +794,42 @@ export async function clearMessages(accountId = getCurrentAccountId()) {
   }
 }
 
-// REAL-TIME EVENT STREAM LISTENER
+// REAL-TIME EVENT STREAM LISTENER WITH AUTO-RECONNECT
 export function listenToDatabaseChanges(callback) {
   let unsubscribe;
-  initialization.then(() => {
-    unsubscribe = onSnapshot(dbRef, snapshot => callback(snapshot.exists() ? snapshot.data() : null));
-  });
-  return () => unsubscribe?.();
+  let retryTimeout;
+
+  function subscribe() {
+    try {
+      unsubscribe = onSnapshot(
+        dbRef,
+        (snapshot) => {
+          callback(snapshot.exists() ? snapshot.data() : null);
+        },
+        (error) => {
+          console.warn("Firestore listener disconnected or error occurred, reconnecting in 2s:", error);
+          if (unsubscribe) {
+            try { unsubscribe(); } catch (_) {}
+          }
+          clearTimeout(retryTimeout);
+          retryTimeout = setTimeout(subscribe, 2000);
+        }
+      );
+    } catch (e) {
+      console.error("Subscription setup failed, retrying in 3s:", e);
+      clearTimeout(retryTimeout);
+      retryTimeout = setTimeout(subscribe, 3000);
+    }
+  }
+
+  initialization.then(subscribe);
+
+  return () => {
+    clearTimeout(retryTimeout);
+    if (unsubscribe) {
+      try { unsubscribe(); } catch (_) {}
+    }
+  };
 }
 
 // AUTO LOGOUT LOGIC (2 HOURS)

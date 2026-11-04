@@ -82,23 +82,72 @@
   <div class="text-center text-slate-400 my-8 text-sm italic">Loading conversation...</div>
 </main>
 
-<!-- Bottom Reply Form -->
-<footer class="bg-white p-3 sm:p-4 border-t border-slate-200 flex items-center gap-2 shadow-sm flex-shrink-0 z-20">
-  <input type="text" id="chat-input" class="flex-1 bg-slate-100 border border-slate-200 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-slate-800 focus:bg-white transition" placeholder="Type a reply to customer...">
-  <button id="send-btn" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-white rounded-full w-10 h-10 flex items-center justify-center shadow transition flex-shrink-0" aria-label="Send reply">
-    <span class="material-symbols-outlined notranslate text-[20px]" translate="no">send</span>
-  </button>
+<!-- Bottom Reply Form with Image Support -->
+<footer class="bg-white border-t border-slate-200 flex flex-col shadow-sm flex-shrink-0 z-20">
+  <!-- Selected Image Preview Bar -->
+  <div id="image-preview-container" class="hidden bg-slate-100 border-b border-slate-200 p-2.5 px-4 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-300 shadow-sm flex-shrink-0 bg-slate-200">
+        <img id="image-preview-img" src="" class="w-full h-full object-cover" alt="Image preview">
+      </div>
+      <div class="min-w-0">
+        <p class="text-xs font-bold text-slate-800 truncate" id="image-preview-name">Photo selected</p>
+        <p class="text-[11px] text-slate-500 font-medium">Ready to send</p>
+      </div>
+    </div>
+    <button type="button" id="remove-image-btn" class="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-white transition flex items-center justify-center" title="Remove photo">
+      <span class="material-symbols-outlined text-[20px] notranslate" translate="no">close</span>
+    </button>
+  </div>
+
+  <!-- Input controls row -->
+  <div class="p-3 sm:p-4 flex items-center gap-2">
+    <!-- Image upload trigger icon -->
+    <label for="chat-image-input" class="cursor-pointer text-slate-500 hover:text-slate-900 hover:bg-slate-100 active:scale-95 rounded-full w-10 h-10 flex items-center justify-center transition flex-shrink-0" title="Attach an image">
+      <span class="material-symbols-outlined text-[24px] notranslate" translate="no">add_photo_alternate</span>
+      <input type="file" id="chat-image-input" accept="image/*" class="hidden">
+    </label>
+
+    <input type="text" id="chat-input" class="flex-1 bg-slate-100 border border-slate-200 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-slate-800 focus:bg-white transition" placeholder="Type a reply to customer...">
+
+    <button id="send-btn" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-white rounded-full w-10 h-10 flex items-center justify-center shadow transition flex-shrink-0 disabled:opacity-50 disabled:pointer-events-none" aria-label="Send reply">
+      <span class="material-symbols-outlined notranslate text-[20px]" translate="no">send</span>
+    </button>
+  </div>
 </footer>
 
+<!-- Lightbox Modal for Full Image View -->
+<div id="image-lightbox-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+  <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center">
+    <div class="absolute -top-11 right-0 flex items-center gap-2">
+      <a id="lightbox-download-link" href="#" target="_blank" download="chat-image.jpg" class="text-white hover:text-blue-300 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition flex items-center justify-center" title="Open full / download">
+        <span class="material-symbols-outlined text-[22px] notranslate" translate="no">download</span>
+      </a>
+      <button type="button" id="lightbox-close-btn" class="text-white hover:text-red-400 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition flex items-center justify-center" title="Close">
+        <span class="material-symbols-outlined text-[24px] notranslate" translate="no">close</span>
+      </button>
+    </div>
+    <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" alt="Enlarged photo">
+  </div>
+</div>
+
 <script type="module">
-  import { addMessage, getMessages, clearMessages, getAllAccounts, listenToDatabaseChanges } from './app.js';
+  import { addMessage, getMessages, clearMessages, getAllAccounts, listenToDatabaseChanges, markMessagesAsSeen, compressImage } from './app.js';
 
   let selectedAccountId = 'account1';
   let cachedAccounts = {};
+  let selectedImageDataUrl = null;
+  let isSending = false;
 
   const box = document.getElementById('chat-box');
   const input = document.getElementById('chat-input');
   const sendBtn = document.getElementById('send-btn');
+  const imageInput = document.getElementById('chat-image-input');
+  const imagePreviewContainer = document.getElementById('image-preview-container');
+  const imagePreviewImg = document.getElementById('image-preview-img');
+  const imagePreviewName = document.getElementById('image-preview-name');
+  const removeImageBtn = document.getElementById('remove-image-btn');
+
   const tabAcc1 = document.getElementById('btn-chat-acc1');
   const tabAcc2 = document.getElementById('btn-chat-acc2');
   const clearBtn = document.getElementById('clear-convo-btn');
@@ -107,6 +156,36 @@
   const activeUserEmail = document.getElementById('active-user-email');
   const activeUserBadge = document.getElementById('active-user-badge');
   const activeUserAvatar = document.getElementById('active-user-avatar');
+
+  // Lightbox elements
+  const lightboxModal = document.getElementById('image-lightbox-modal');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxCloseBtn = document.getElementById('lightbox-close-btn');
+  const lightboxDownloadLink = document.getElementById('lightbox-download-link');
+
+  window.openChatImageModal = function(src) {
+    if (!src) return;
+    lightboxImg.src = src;
+    lightboxDownloadLink.href = src;
+    lightboxModal.classList.remove('hidden');
+    lightboxModal.classList.add('flex');
+  };
+
+  function closeLightbox() {
+    lightboxModal.classList.add('hidden');
+    lightboxModal.classList.remove('flex');
+    lightboxImg.src = '';
+  }
+
+  lightboxCloseBtn.addEventListener('click', closeLightbox);
+  lightboxModal.addEventListener('click', (e) => {
+    if (e.target === lightboxModal) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !lightboxModal.classList.contains('hidden')) {
+      closeLightbox();
+    }
+  });
 
   function updateTabButtons() {
     if (selectedAccountId === 'account1') {
@@ -150,7 +229,7 @@
             <span class="material-symbols-outlined text-[28px] notranslate" translate="no">chat_bubble_outline</span>
           </div>
           <p class="text-sm font-semibold text-slate-600">No messages yet with ${activeUserName.textContent}.</p>
-          <p class="text-xs text-slate-400 mt-0.5">Send a message below to begin this customer support thread.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Send a message or photo below to begin this customer support thread.</p>
         </div>
       `;
       return;
@@ -163,15 +242,67 @@
       
       const el = document.createElement('div');
       el.className = `max-w-[85%] sm:max-w-[70%] px-4 py-2.5 ${radiusClass} ${alignClass} shadow-sm break-words`;
+
+      // Status indicator (Seen / Delivered) for Admin's sent messages
+      let statusHtml = '';
+      if (isAdmin) {
+        if (m.seen) {
+          statusHtml = `
+            <span class="inline-flex items-center gap-1 font-semibold text-slate-300" title="Seen by Customer">
+              <span>${m.time || ''}</span>
+              <span class="material-symbols-outlined text-[13px] text-blue-400 notranslate" translate="no">done_all</span>
+              <span class="text-blue-300 font-bold">Seen</span>
+            </span>
+          `;
+        } else {
+          statusHtml = `
+            <span class="inline-flex items-center gap-1 text-slate-400" title="Delivered">
+              <span>${m.time || ''}</span>
+              <span class="material-symbols-outlined text-[13px] notranslate" translate="no">check</span>
+              <span>Delivered</span>
+            </span>
+          `;
+        }
+      } else {
+        statusHtml = `<span class="text-slate-400">${m.time || ''}</span>`;
+      }
+
+      // Image rendering if message contains a photo
+      let imageHtml = '';
+      if (m.image) {
+        imageHtml = `
+          <div class="mb-2 rounded-xl overflow-hidden cursor-pointer group relative shadow-sm border border-black/10 bg-black/5" onclick="window.openChatImageModal('${m.image}')">
+            <img src="${m.image}" class="w-full max-h-64 object-cover rounded-xl transition duration-150 group-hover:scale-[1.01]" alt="Attached image" loading="lazy">
+            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white pointer-events-none">
+              <span class="material-symbols-outlined text-[26px] drop-shadow notranslate" translate="no">zoom_in</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const textHtml = m.text ? `<p class="text-sm leading-relaxed whitespace-pre-wrap">${m.text}</p>` : '';
+
       el.innerHTML = `
         <div class="text-[11px] font-bold mb-1 ${isAdmin ? 'text-slate-300' : 'text-blue-700'}">${m.sender}</div>
-        <p class="text-sm leading-relaxed whitespace-pre-wrap">${m.text}</p>
-        <div class="text-[10px] text-right mt-1.5 ${isAdmin ? 'text-slate-400' : 'text-slate-400'}">${m.time}</div>
+        ${imageHtml}
+        ${textHtml}
+        <div class="text-[10px] text-right mt-1.5 flex items-center justify-end gap-1.5">
+          ${statusHtml}
+        </div>
       `;
       box.appendChild(el);
     });
     
     box.scrollTop = box.scrollHeight;
+  }
+
+  // Mark customer messages as viewed by admin
+  async function checkAndMarkSeen(messages) {
+    if (!messages || !Array.isArray(messages)) return;
+    const hasUnseenCustomerMsg = messages.some(m => m.sender !== 'Admin' && !m.seen);
+    if (hasUnseenCustomerMsg) {
+      await markMessagesAsSeen(selectedAccountId, 'admin');
+    }
   }
 
   async function selectAccount(accKey) {
@@ -184,25 +315,76 @@
     }
     const msgs = await getMessages(accKey);
     renderMessages(msgs);
+    await checkAndMarkSeen(msgs);
   }
 
   tabAcc1.addEventListener('click', () => selectAccount('account1'));
   tabAcc2.addEventListener('click', () => selectAccount('account2'));
 
-  async function pushAdminReply() {
-    const text = input.value.trim();
-    if (text) {
-      const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-      const newMsgObj = {
-        sender: 'Admin',
-        text: text,
-        time: timestamp
-      };
+  // Image selection handler
+  imageInput.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      input.value = '';
+    try {
+      // Compress image to ensure lightweight payload (< 50KB) and prevent Firestore document limits
+      selectedImageDataUrl = await compressImage(file, 800, 800, 0.75);
+      imagePreviewImg.src = selectedImageDataUrl;
+      imagePreviewName.textContent = file.name || 'Photo selected';
+      imagePreviewContainer.classList.remove('hidden');
+      input.focus();
+    } catch (err) {
+      console.error('Image compression failed:', err);
+      alert('Could not attach this image. Please select a valid photo file.');
+      clearImageSelection();
+    }
+  });
+
+  function clearImageSelection() {
+    selectedImageDataUrl = null;
+    imageInput.value = '';
+    imagePreviewImg.src = '';
+    imagePreviewContainer.classList.add('hidden');
+  }
+
+  removeImageBtn.addEventListener('click', clearImageSelection);
+
+  async function pushAdminReply() {
+    if (isSending) return;
+    const text = input.value.trim();
+    const image = selectedImageDataUrl;
+
+    if (!text && !image) return;
+
+    isSending = true;
+    sendBtn.disabled = true;
+
+    const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const newMsgObj = {
+      id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      sender: 'Admin',
+      text: text,
+      image: image || null,
+      time: timestamp,
+      timestamp: Date.now(),
+      seen: false
+    };
+
+    input.value = '';
+    clearImageSelection();
+
+    try {
       await addMessage(newMsgObj, selectedAccountId);
       const msgs = await getMessages(selectedAccountId);
       renderMessages(msgs);
+    } catch (err) {
+      console.error('Failed to send admin reply:', err);
+      alert('Reply could not be sent. Please check your connection and try again.');
+      if (text) input.value = text;
+    } finally {
+      isSending = false;
+      sendBtn.disabled = false;
+      input.focus();
     }
   }
 
@@ -236,10 +418,11 @@
     }
     const msgs = await getMessages(selectedAccountId);
     renderMessages(msgs);
+    await checkAndMarkSeen(msgs);
   }
 
   // Real-time listener
-  listenToDatabaseChanges((dbData) => {
+  listenToDatabaseChanges(async (dbData) => {
     if (!dbData) return;
     if (dbData.accounts) {
       cachedAccounts = dbData.accounts;
@@ -248,7 +431,20 @@
         ? targetAcc.messages
         : (selectedAccountId === 'account1' && Array.isArray(dbData.tb_messages) ? dbData.tb_messages : []);
       renderMessages(accMsgs);
+      await checkAndMarkSeen(accMsgs);
     }
+  });
+
+  // When tab becomes visible again, ensure unread messages are marked seen
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible') {
+      const msgs = await getMessages(selectedAccountId);
+      await checkAndMarkSeen(msgs);
+    }
+  });
+  window.addEventListener('focus', async () => {
+    const msgs = await getMessages(selectedAccountId);
+    await checkAndMarkSeen(msgs);
   });
 
   if (document.readyState === 'loading') {
